@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esmaltes de Alta Temperatura</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F3EE;
+    --warm-white: #FDF9F5;
+    --clay: #C4896A;
+    --clay-light: #E8C5AE;
+    --clay-dark: #8B5A3C;
+    --plum: #7B5EA7;
+    --plum-light: #C4A8E0;
+    --plum-pale: #F0EAF8;
+    --merlot: #8B2252;
+    --teal: #2A7A6A;
+    --teal-light: #A8D5CC;
+    --teal-pale: #E8F5F2;
+    --honey: #D4873A;
+    --honey-pale: #FDF0E0;
+    --ink: #1A1412;
+    --mid: #6B5B52;
+    --faint: #C4B5AC;
+    --warn-bg: #FFF8E8;
+    --warn-border: #E8B84B;
+    --warn-text: #7A5A10;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); font-size: 15px; line-height: 1.65; }
+
+  header {
+    background: var(--ink); color: var(--cream);
+    padding: 52px 48px 44px; position: relative; overflow: hidden;
+  }
+  header::before {
+    content:''; position:absolute; top:-60px; right:-60px;
+    width:320px; height:320px; border-radius:50%;
+    background: radial-gradient(circle, rgba(123,94,167,0.25) 0%, transparent 70%);
+  }
+  header::after {
+    content:''; position:absolute; bottom:-40px; left:200px;
+    width:200px; height:200px; border-radius:50%;
+    background: radial-gradient(circle, rgba(196,137,106,0.20) 0%, transparent 70%);
+  }
+  .header-tag { display:inline-block; font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--clay-light); border:1px solid rgba(196,137,106,.4); padding:4px 12px; border-radius:20px; margin-bottom:18px; }
+  header h1 { font-family:'Playfair Display',serif; font-size:clamp(28px,4.5vw,48px); font-weight:400; line-height:1.15; margin-bottom:12px; }
+  header h1 em { font-style:italic; color:var(--plum-light); }
+  header p { font-size:13px; color:rgba(247,243,238,.6); max-width:480px; font-weight:300; }
+  .temp-badges { display:flex; gap:10px; margin-top:24px; flex-wrap:wrap; }
+  .temp-badge { font-size:11px; font-weight:500; padding:5px 14px; border-radius:20px; letter-spacing:.03em; }
+  .badge-c6 { background:rgba(196,137,106,.2); color:var(--clay-light); border:1px solid rgba(196,137,106,.35); }
+  .badge-c10 { background:rgba(123,94,167,.2); color:var(--plum-light); border:1px solid rgba(123,94,167,.35); }
+
+  nav { background:var(--warm-white); border-bottom:1px solid rgba(196,137,106,.2); padding:0 48px; display:flex; gap:0; overflow-x:auto; position:sticky; top:0; z-index:100; }
+  nav a { display:block; padding:15px 18px; font-size:11px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--mid); text-decoration:none; border-bottom:2px solid transparent; white-space:nowrap; transition:color .2s,border-color .2s; }
+  nav a:hover { color:var(--clay-dark); border-bottom-color:var(--clay); }
+
+  main { max-width:960px; margin:0 auto; padding:48px 32px 80px; }
+  section { margin-bottom:72px; }
+
+  .section-header { display:flex; align-items:baseline; gap:16px; margin-bottom:28px; padding-bottom:14px; border-bottom:1px solid var(--clay-light); }
+  .section-num { font-family:'Playfair Display',serif; font-size:38px; font-weight:400; color:var(--clay-light); line-height:1; }
+  .section-title { font-family:'Playfair Display',serif; font-size:21px; font-weight:600; color:var(--ink); line-height:1.2; }
+
+  /* GLAZE CARDS */
+  .glaze-card { background:var(--warm-white); border:1px solid rgba(196,137,106,.18); border-radius:16px; overflow:hidden; margin-bottom:32px; }
+  .card-stripe { height:6px; }
+  .stripe-chun   { background:linear-gradient(90deg,#C4A8E0,#8B7EC8,#C4886A); }
+  .stripe-honey  { background:linear-gradient(90deg,#D4873A,#E8C08A,#D4A860); }
+  .stripe-blossom{ background:linear-gradient(90deg,#E8A0C0,#C4A8E0,#F0C8D8); }
+  .stripe-merlot { background:linear-gradient(90deg,#8B2252,#6B3A7A,#C4886A); }
+  .card-body { padding:24px; }
+  .card-meta { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:8px; }
+  .card-name { font-family:'Playfair Display',serif; font-size:17px; font-weight:600; color:var(--ink); }
+  .cone-tag { font-size:10px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; padding:3px 10px; border-radius:12px; }
+  .tag-6 { background:var(--honey-pale); color:var(--clay-dark); }
+  .tag-10 { background:var(--plum-pale); color:var(--plum); }
+  .card-desc { font-size:13px; color:var(--mid); margin-bottom:20px; line-height:1.55; }
+
+  /* FORMULA TABLE with function column */
+  .formula-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .formula-table thead tr { background:var(--ink); }
+  .formula-table thead th { font-size:10px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--cream); padding:9px 12px; text-align:left; }
+  .formula-table thead th.pct-head { text-align:center; width:80px; }
+  .formula-table tbody tr { border-bottom:1px solid rgba(196,165,140,.15); }
+  .formula-table tbody tr:last-child { border-bottom:none; }
+  .formula-table td { padding:10px 12px; vertical-align:top; }
+  .formula-table tbody tr:nth-child(odd) { background:rgba(196,137,106,.04); }
+  .pct-cell { text-align:center; }
+  .pct-pill { display:inline-block; font-weight:600; font-size:13px; font-variant-numeric:tabular-nums; background:var(--cream); border:1px solid var(--clay-light); border-radius:8px; padding:2px 8px; color:var(--clay-dark); }
+  .fn-text { font-size:12px; color:var(--mid); line-height:1.5; }
+  .fn-role { font-size:10px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--clay); margin-bottom:2px; }
+  .total-row { background:var(--clay-light) !important; }
+  .total-row td { font-weight:600; font-size:13px; color:var(--clay-dark); padding:9px 12px; }
+
+  .card-note { margin-top:14px; background:var(--cream); border-left:3px solid var(--clay-light); border-radius:0 8px 8px 0; padding:10px 14px; font-size:12px; color:var(--mid); line-height:1.55; }
+  .card-note strong { color:var(--clay-dark); font-weight:500; }
+  .warn-note { margin-top:10px; background:var(--warn-bg); border-left:3px solid var(--warn-border); border-radius:0 8px 8px 0; padding:10px 14px; font-size:12px; color:var(--warn-text); line-height:1.55; }
+  .correction-badge { display:inline-block; font-size:10px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; background:#FFF3E0; color:#A0520A; border:1px solid #E8B84B; border-radius:12px; padding:2px 8px; margin-left:8px; vertical-align:middle; }
+
+  /* COMPARE */
+  .compare-wrap { background:var(--warm-white); border:1px solid rgba(196,137,106,.18); border-radius:16px; overflow:hidden; margin-bottom:20px; }
+  .compare-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .compare-table thead tr { background:var(--ink); }
+  .compare-table thead th { font-size:10px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--cream); padding:11px 16px; text-align:center; }
+  .compare-table thead th:first-child { text-align:left; }
+  .compare-table tbody tr { border-bottom:1px solid rgba(196,165,140,.15); }
+  .compare-table td { padding:11px 16px; text-align:center; }
+  .compare-table td:first-child { text-align:left; }
+  .compare-table tbody tr:nth-child(odd) { background:rgba(196,137,106,.04); }
+  .total-compare { background:var(--clay-light) !important; }
+  .total-compare td { font-weight:600; color:var(--clay-dark); }
+  .change-up   { color:var(--teal); font-weight:600; }
+  .change-down { color:var(--merlot); font-weight:600; }
+  .change-same { color:var(--faint); font-weight:500; }
+
+  /* REASONS */
+  .reasons-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; margin-top:8px; }
+  .reason-card { background:var(--warm-white); border:1px solid rgba(196,137,106,.18); border-radius:12px; padding:18px 20px; display:flex; gap:14px; align-items:flex-start; }
+  .reason-icon { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0; }
+  .icon-up   { background:var(--teal-pale); color:var(--teal); }
+  .icon-down { background:#FDF0F4; color:var(--merlot); }
+  .icon-same { background:var(--cream); color:var(--faint); }
+  .reason-text { font-size:13px; color:var(--mid); line-height:1.55; }
+  .reason-text strong { color:var(--ink); font-weight:500; display:block; margin-bottom:3px; font-size:14px; }
+
+  /* COLORANTS */
+  .colorant-wrap { background:var(--warm-white); border:1px solid rgba(196,137,106,.18); border-radius:16px; overflow:hidden; margin-bottom:20px; }
+  .colorant-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .colorant-table thead tr { background:var(--ink); }
+  .colorant-table thead th { font-size:10px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--cream); padding:10px 16px; text-align:left; }
+  .colorant-table tbody tr { border-bottom:1px solid rgba(196,165,140,.15); }
+  .colorant-table td { padding:10px 16px; vertical-align:top; }
+  .colorant-table tbody tr:nth-child(odd) { background:rgba(196,137,106,.04); }
+  .color-swatch { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; vertical-align:middle; }
+
+  /* TIPS */
+  .tips-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
+  .tip-card { background:var(--warm-white); border:1px solid rgba(196,137,106,.18); border-radius:14px; padding:22px; }
+  .tip-title { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:var(--ink); margin-bottom:12px; }
+  .tip-list { list-style:none; }
+  .tip-list li { font-size:13px; color:var(--mid); padding:5px 0 5px 16px; position:relative; border-bottom:1px solid rgba(196,165,140,.12); line-height:1.5; }
+  .tip-list li:last-child { border-bottom:none; }
+  .tip-list li::before { content:'—'; position:absolute; left:0; color:var(--clay-light); font-size:11px; top:7px; }
+
+  /* EQUIV */
+  .equiv-wrap { background:var(--warm-white); border:1px solid rgba(196,137,106,.18); border-radius:16px; overflow:hidden; }
+  .equiv-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .equiv-table thead tr { background:var(--clay-dark); }
+  .equiv-table thead th { font-size:10px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--cream); padding:11px 16px; text-align:left; }
+  .equiv-table tbody tr { border-bottom:1px solid rgba(196,165,140,.15); }
+  .equiv-table td { padding:10px 16px; }
+  .equiv-table tbody tr:nth-child(odd) { background:rgba(196,137,106,.04); }
+
+  footer { background:var(--ink); color:rgba(247,243,238,.4); text-align:center; padding:28px; font-size:12px; letter-spacing:.04em; }
+
+  @media print { nav{display:none} footer{display:none} }
+  @media (max-width:600px) {
+    header{padding:36px 20px 30px} main{padding:32px 16px 60px} nav{padding:0 12px}
+    .formula-table .fn-col{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Guía de formulación cerámica</div>
+  <h1>Esmaltes de <em>alta temperatura</em><br>con efectos fluidos</h1>
+  <p>Drips, variegaciones y opalescencias. Fórmulas revisadas con ingredientes accesibles en Europa.</p>
+  <div class="temp-badges">
+    <span class="temp-badge badge-c6">Cono 6 · 1220–1240 °C</span>
+    <span class="temp-badge badge-c10">Cono 10 reducción · 1280–1300 °C</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#bases">Bases fluidas</a>
+  <a href="#ajuste">Cono 6 → 10</a>
+  <a href="#colorantes">Colorantes</a>
+  <a href="#consejos">Consejos</a>
+  <a href="#equivalencias">Equivalencias</a>
+</nav>
+
+<main>
+
+<!-- ════════════════════════════════════
+     1. BASES FLUIDAS
+════════════════════════════════════ -->
+<section id="bases">
+  <div class="section-header">
+    <span class="section-num">1</span>
+    <span class="section-title">Bases fluidas — fórmulas revisadas</span>
+  </div>
+  <p style="font-size:13px;color:var(--mid);margin-bottom:28px;font-style:italic;">
+    Todos los porcentajes son sobre 100 partes en peso. La columna <em>función</em> explica qué aporta cada material a la fórmula.
+  </p>
+
+  <!-- 1a. CHUN BASE -->
+  <div class="glaze-card">
+    <div class="card-stripe stripe-chun"></div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-name">Chun base clásico</span>
+        <span class="cone-tag tag-6">Cono 6</span>
+      </div>
+      <p class="card-desc">Efecto lácteo y opalescente con drips controlados. Base de los efectos chun plum de las imágenes. Peso específico al aplicar: 1,38–1,42.</p>
+      <table class="formula-table">
+        <thead>
+          <tr><th>Ingrediente</th><th class="pct-head">%</th><th class="fn-col">Función</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Feldespato potásico<br><small style="color:var(--faint)">Custer / Microcline Sibelco</small></td>
+            <td class="pct-cell"><span class="pct-pill">40%</span></td>
+            <td><div class="fn-role">Fundente principal</div><div class="fn-text">Aporta K₂O y Al₂O₃. Es el esqueleto vítreo del esmalte: funde y forma la capa. Sin él no hay esmalte.</div></td>
+          </tr>
+          <tr>
+            <td>Sílice (325 mesh)</td>
+            <td class="pct-cell"><span class="pct-pill">25%</span></td>
+            <td><div class="fn-role">Formador de vidrio</div><div class="fn-text">SiO₂ puro. Da dureza, resistencia química y transparencia. Sube la temperatura de fusión — controla que el esmalte no fluya en exceso.</div></td>
+          </tr>
+          <tr>
+            <td>Whiting (CaCO₃)</td>
+            <td class="pct-cell"><span class="pct-pill">20%</span></td>
+            <td><div class="fn-role">Fundente secundario + opalescencia</div><div class="fn-text">Aporta CaO. A cono 6 provoca la separación de fases que genera el efecto opalescente azul-lechoso característico del chun. El 20% es deliberadamente alto para maximizar este efecto.</div></td>
+          </tr>
+          <tr>
+            <td>Caolín EPK</td>
+            <td class="pct-cell"><span class="pct-pill">10%</span></td>
+            <td><div class="fn-role">Estabilizador + suspensor</div><div class="fn-text">Aporta Al₂O₃ que aumenta la viscosidad del fundido (evita que fluya demasiado) y arcilla cruda que mantiene la mezcla en suspensión en el bote.</div></td>
+          </tr>
+          <tr>
+            <td>Talco</td>
+            <td class="pct-cell"><span class="pct-pill">5%</span></td>
+            <td><div class="fn-role">Fundente suave + textura</div><div class="fn-text">Aporta MgO. Suaviza el punto de fusión y contribuye a la separación de fases que crea la opalescencia. El 5% es la cantidad justa para no sobrefluir a cono 6.</div></td>
+          </tr>
+        </tbody>
+        <tfoot><tr class="total-row"><td colspan="2">Total</td><td><strong>100%</strong></td></tr></tfoot>
+      </table>
+      <div class="card-note">
+        <strong>Chun plum:</strong> añadir fuera de la base 0,5% carbonato de cobalto + 0,2% óxido de cromo.<br>
+        <strong>Opacidad extra:</strong> añadir 2–4% de óxido de estaño como aditivo externo.
+      </div>
+    </div>
+  </div>
+
+  <!-- 1b. HONEY FLUX (CORREGIDO) -->
+  <div class="glaze-card">
+    <div class="card-stripe stripe-honey"></div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-name">Honey Flux <span class="correction-badge">corregido</span></span>
+        <span class="cone-tag tag-6">Cono 6</span>
+      </div>
+      <p class="card-desc">Muy fluido, drips pronunciados. Versión anterior tenía whiting demasiado alto (22%) para feldespato sódico, causando exceso de fluidez. Corregido a 18%. Peso específico: 1,38–1,40.</p>
+      <table class="formula-table">
+        <thead>
+          <tr><th>Ingrediente</th><th class="pct-head">%</th><th class="fn-col">Función</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Feldespato sódico<br><small style="color:var(--faint)">Minspar 200 / F-4</small></td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--honey);color:var(--clay-dark)">45%</span></td>
+            <td><div class="fn-role">Fundente principal</div><div class="fn-text">El feldespato sódico funde a temperatura más baja que el potásico (mayor contenido en Na₂O). Por eso este esmalte es más fluido que el Chun — es su característica deseada.</div></td>
+          </tr>
+          <tr>
+            <td>Sílice (325 mesh)</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--honey);color:var(--clay-dark)">22%</span></td>
+            <td><div class="fn-role">Formador de vidrio</div><div class="fn-text">Sube ligeramente respecto a la versión original para compensar la mayor fluidez del feldespato sódico y dar más cuerpo al fundido.</div></td>
+          </tr>
+          <tr>
+            <td>Whiting (CaCO₃)</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--honey);color:var(--clay-dark)">18%</span></td>
+            <td><div class="fn-role">Fundente secundario</div><div class="fn-text">Reducido de 22% a 18%: el CaO fluxea mucho a cono 6, y combinado con feldespato sódico la versión anterior era demasiado líquida. 18% da flujo controlado.</div></td>
+          </tr>
+          <tr>
+            <td>Caolín EPK</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--honey);color:var(--clay-dark)">10%</span></td>
+            <td><div class="fn-role">Estabilizador + suspensor</div><div class="fn-text">Sube de 8% a 10%: más alúmina para frenar la fluidez excesiva del feldespato sódico y mantener la mezcla homogénea en el bote.</div></td>
+          </tr>
+          <tr>
+            <td>Dolomita</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--honey);color:var(--clay-dark)">5%</span></td>
+            <td><div class="fn-role">Fundente doble (Ca + Mg)</div><div class="fn-text">Aporta CaO y MgO simultáneamente. Suaviza la textura superficial y contribuye a la fluidez escalonada que produce los drips. El 5% da personalidad sin desbordarse.</div></td>
+          </tr>
+        </tbody>
+        <tfoot><tr class="total-row"><td colspan="2">Total</td><td><strong>100%</strong></td></tr></tfoot>
+      </table>
+      <div class="warn-note">⚠ <strong>Versión anterior:</strong> whiting al 22% con feldespato sódico es excesivo a cono 6 — el esmalte fluye demasiado y puede pegar al kiln shelf. Usar esta versión corregida (18% whiting, 22% sílice, 10% caolín).</div>
+      <div class="card-note">Con óxido de hierro al 3–4% (externo) da tonos ámbar/miel. Aplicar solo en la mitad superior de la pieza.</div>
+    </div>
+  </div>
+
+  <!-- 1c. FLUX BLOSSOM -->
+  <div class="glaze-card">
+    <div class="card-stripe stripe-blossom"></div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-name">Flux Blossom / Fairy Rose</span>
+        <span class="cone-tag tag-6">Cono 6</span>
+      </div>
+      <p class="card-desc">Efecto nebuloso rosado/malva con acabado mate-sedoso. El bario es el ingrediente clave que genera esta textura. Peso específico: 1,40–1,44.</p>
+      <table class="formula-table">
+        <thead>
+          <tr><th>Ingrediente</th><th class="pct-head">%</th><th class="fn-col">Función</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Feldespato potásico</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--plum-light);color:var(--plum)">35%</span></td>
+            <td><div class="fn-role">Fundente principal</div><div class="fn-text">Base vítrea del esmalte. Menos que en el Chun (35% vs 40%) porque el bario y la dolomita aportan fundentes adicionales — no necesita tanto feldespato.</div></td>
+          </tr>
+          <tr>
+            <td>Sílice (325 mesh)</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--plum-light);color:var(--plum)">22%</span></td>
+            <td><div class="fn-role">Formador de vidrio + dureza</div><div class="fn-text">Da resistencia mecánica y controla la fluidez. El 22% es equilibrado para un esmalte semimate: suficiente para no cuartear pero sin crear un acabado brillante.</div></td>
+          </tr>
+          <tr>
+            <td>Whiting (CaCO₃)</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--plum-light);color:var(--plum)">15%</span></td>
+            <td><div class="fn-role">Fundente secundario</div><div class="fn-text">Menos que en el Chun porque ya hay bario y dolomita como fundentes adicionales. 15% evita que la fórmula se vuelva demasiado fluida con tres fuentes alcalino-térreas.</div></td>
+          </tr>
+          <tr>
+            <td>Carbonato de bario <strong>*</strong></td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--plum-light);color:var(--plum)">15%</span></td>
+            <td><div class="fn-role">Fundente mate ★ ingrediente clave</div><div class="fn-text">BaCO₃ es el responsable directo del acabado mate-sedoso y la textura nebulosa. El BaO no forma vidrio fácilmente — crea una superficie cristalizada fina que difunde la luz. Sin él, el esmalte sería brillante normal.</div></td>
+          </tr>
+          <tr>
+            <td>Caolín EPK</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--plum-light);color:var(--plum)">8%</span></td>
+            <td><div class="fn-role">Estabilizador + suspensor</div><div class="fn-text">Aporta alúmina para viscosidad y mantiene los materiales en suspensión. 8% es suficiente — más alúmina endurecería demasiado el esmalte y perdería el efecto sedoso.</div></td>
+          </tr>
+          <tr>
+            <td>Dolomita</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--plum-light);color:var(--plum)">5%</span></td>
+            <td><div class="fn-role">Fundente suave + textura</div><div class="fn-text">MgO + CaO. Junto con el bario completa el efecto mate. El MgO en pequeñas cantidades crea superficies satinadas — más que 5% daría un mate duro y poco atractivo.</div></td>
+          </tr>
+        </tbody>
+        <tfoot><tr class="total-row"><td colspan="2">Total</td><td><strong>100%</strong></td></tr></tfoot>
+      </table>
+      <div class="warn-note">⚠ <strong>Seguridad:</strong> el carbonato de bario es tóxico en polvo crudo — usar siempre guantes y mascarilla al pesar y mezclar. Una vez cocido el BaO queda atrapado en la red vítrea y es completamente seguro.</div>
+      <div class="card-note">Para tonos rosa/malva: añadir 0,3% carbonato de cobalto + 0,5% óxido de hierro rojo (aditivos externos, sobre el 100%).</div>
+    </div>
+  </div>
+
+  <!-- 1d. IRON LUSTRE (CORREGIDO) -->
+  <div class="glaze-card">
+    <div class="card-stripe stripe-merlot"></div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="card-name">Iron Lustre / Smokey Merlot <span class="correction-badge">corregido</span></span>
+        <span class="cone-tag tag-10">Cono 10 reducción</span>
+      </div>
+      <p class="card-desc">Para hornos de gas o leña. El hierro alto en reducción produce iridiscencias metálicas ahumadas. Versión anterior tenía el cobalto mal integrado — corregido a aditivo externo. Peso específico: 1,42–1,45.</p>
+      <table class="formula-table">
+        <thead>
+          <tr><th>Ingrediente</th><th class="pct-head">%</th><th class="fn-col">Función</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Feldespato potásico</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--merlot);color:var(--merlot)">40%</span></td>
+            <td><div class="fn-role">Fundente principal</div><div class="fn-text">A cono 10 el feldespato funde completamente y forma la base vítrea. 40% es conservador — suficiente para un esmalte estable sin que fluya en exceso.</div></td>
+          </tr>
+          <tr>
+            <td>Sílice (325 mesh)</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--merlot);color:var(--merlot)">27%</span></td>
+            <td><div class="fn-role">Formador de vidrio + estabilidad</div><div class="fn-text">Más sílice que en cono 6 (27% vs 25%) porque a 1300°C todo tiende a sobrefluir — la sílice extra aumenta la viscosidad del fundido y da estabilidad química.</div></td>
+          </tr>
+          <tr>
+            <td>Whiting (CaCO₃)</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--merlot);color:var(--merlot)">18%</span></td>
+            <td><div class="fn-role">Fundente secundario</div><div class="fn-text">A cono 10 el CaO fluxea con mucha energía. 18% da la fluidez para crear los drips y el lustre metálico sin que el esmalte se acumule en la base de la pieza.</div></td>
+          </tr>
+          <tr>
+            <td>Caolín EPK</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--merlot);color:var(--merlot)">15%</span></td>
+            <td><div class="fn-role">Estabilizador alúmina</div><div class="fn-text">Más alúmina que en cono 6 (15% vs 10%) para compensar la mayor temperatura y evitar que el esmalte fluya hasta el kiln shelf. Es el "freno" de la fórmula.</div></td>
+          </tr>
+          <tr>
+            <td>Óxido de hierro rojo</td>
+            <td class="pct-cell"><span class="pct-pill" style="border-color:var(--merlot);color:var(--merlot)">+ 6%</span></td>
+            <td><div class="fn-role">Colorante + lustre metálico</div><div class="fn-text">Fe₂O₃ en reducción se convierte en FeO (negro/metálico). Al 6% en atmósfera reductora produce los iridiscentes marrones/negros metálicos con destellos. <em>Aditivo externo: se añade sobre el 100%.</em></div></td>
+          </tr>
+        </tbody>
+        <tfoot><tr class="total-row"><td colspan="2">Base</td><td><strong>100%</strong></td></tr></tfoot>
+      </table>
+      <div class="warn-note">⚠ <strong>Corrección respecto a versión anterior:</strong> el cobalto al 1% estaba integrado dentro del 100%, lo que es excesivo (mancharía todo de azul oscuro). El cobalto debe usarse como aditivo externo al 0,3–0,5% si se quiere el tono merlot violáceo. Para el lustre metálico puro basta con el hierro.</div>
+      <div class="card-note">
+        <strong>Para efecto merlot ahumado:</strong> añadir 0,3–0,5% carbonato de cobalto externo.<br>
+        <strong>Para tono más oscuro:</strong> añadir 1% óxido de manganeso externo.
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ════════════════════════════════════
+     2. AJUSTE CONO 6 → 10
+════════════════════════════════════ -->
+<section id="ajuste">
+  <div class="section-header">
+    <span class="section-num">2</span>
+    <span class="section-title">Ajuste del Chun base: cono 6 → cono 10 reducción</span>
+  </div>
+
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead><tr><th>Ingrediente</th><th>Cono 6</th><th>Cono 10</th><th>Cambio</th></tr></thead>
+      <tbody>
+        <tr><td>Feldespato potásico</td><td>40%</td><td><strong>45%</strong></td><td><span class="change-up">+5%</span></td></tr>
+        <tr><td>Sílice (325 mesh)</td><td>25%</td><td><strong>27%</strong></td><td><span class="change-up">+2%</span></td></tr>
+        <tr><td>Whiting (CaCO₃)</td><td>20%</td><td><strong>15%</strong></td><td><span class="change-down">−5%</span></td></tr>
+        <tr><td>Caolín EPK</td><td>10%</td><td><strong>10%</strong></td><td><span class="change-same">—</span></td></tr>
+        <tr><td>Talco</td><td>5%</td><td><strong>3%</strong></td><td><span class="change-down">−2%</span></td></tr>
+      </tbody>
+      <tfoot><tr class="total-compare"><td>Total</td><td>100%</td><td>100%</td><td>—</td></tr></tfoot>
+    </table>
+  </div>
+  <p style="font-size:13px;color:var(--mid);margin-bottom:20px;font-style:italic;">Peso específico al aplicar en cono 10: 1,40–1,45.</p>
+
+  <div class="reasons-grid">
+    <div class="reason-card"><div class="reason-icon icon-up">↑</div><div class="reason-text"><strong>+ Feldespato (+5%)</strong>A cono 10 todo fluxea más. Más feldespato da cuerpo al fundido y evita que el esmalte quede aguado.</div></div>
+    <div class="reason-card"><div class="reason-icon icon-up">↑</div><div class="reason-text"><strong>+ Sílice (+2%)</strong>Más sílice aumenta la viscosidad del fundido y la estabilidad química. Reduce el riesgo de cuarteo en frío.</div></div>
+    <div class="reason-card"><div class="reason-icon icon-down">↓</div><div class="reason-text"><strong>− Whiting (−5%)</strong>El CaO es un fundente muy activo a 1300°C. Bajarlo evita exceso de fluidez y acumulación en la base.</div></div>
+    <div class="reason-card"><div class="reason-icon icon-down">↓</div><div class="reason-text"><strong>− Talco (−2%)</strong>El MgO del talco también fluxea a cono 10. Con menos se mantiene la opalescencia sin sobrefluir.</div></div>
+    <div class="reason-card"><div class="reason-icon icon-same">–</div><div class="reason-text"><strong>= Caolín (igual)</strong>Aporta alúmina (estabilidad) y suspende la mezcla. Su función estructural no cambia con la temperatura.</div></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     3. COLORANTES
+════════════════════════════════════ -->
+<section id="colorantes">
+  <div class="section-header">
+    <span class="section-num">3</span>
+    <span class="section-title">Colorantes y óxidos</span>
+  </div>
+  <p style="font-size:13px;color:var(--mid);margin-bottom:20px;font-style:italic;">
+    Se añaden como aditivos <strong>externos</strong> al 100% de la base — no modifican la suma interna. Empezar siempre por el límite inferior y probar en probeta.
+  </p>
+
+  <h3 style="font-size:12px;font-weight:500;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;">Para bases cono 6</h3>
+  <div class="colorant-wrap">
+    <table class="colorant-table">
+      <thead><tr><th>Colorante</th><th>Cantidad</th><th>Resultado</th><th>Mecanismo</th></tr></thead>
+      <tbody>
+        <tr><td><span class="color-swatch" style="background:#534AB7"></span>Carbonato de cobalto</td><td>0,3–0,5%</td><td>Malva / azul</td><td style="font-size:12px;color:var(--mid)">El Co²⁺ absorbe longitudes de onda rojas/verdes. Muy potente — 0,5% ya da color intenso.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#7B5EA7"></span>Cobalto + óxido de cromo</td><td>0,5% + 0,2%</td><td>Violeta profundo (chun plum)</td><td style="font-size:12px;color:var(--mid)">El Cr³⁺ desvía el azul del cobalto hacia el rojo-violeta. Pequeña cantidad de cromo cambia mucho el tono.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#D4873A"></span>Óxido de hierro rojo</td><td>2–4%</td><td>Ámbar / miel</td><td style="font-size:12px;color:var(--mid)">Fe₂O₃ en atmósfera oxidante da tonos cálidos. Necesita más cantidad que el cobalto por ser menos potente.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#8B5A3C"></span>Óxido de manganeso</td><td>1–2%</td><td>Marrón rosado / malva</td><td style="font-size:12px;color:var(--mid)">El Mn²⁺/Mn³⁺ da tonos terrosos/rosáceos. Combinado con cobalto amplifica el violeta.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#2A7A6A"></span>Carbonato de cobre</td><td>0,5–1%</td><td>Turquesa / verde</td><td style="font-size:12px;color:var(--mid)">Cu²⁺ en oxidación da turquesa. En bases ricas en calcio puede virar a verde azulado.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#E8E0D8;border:1px solid #ccc"></span>Óxido de estaño</td><td>5–8%</td><td>Blanco opaco</td><td style="font-size:12px;color:var(--mid)">No es colorante: las partículas de SnO₂ dispersan la luz creando opacidad. Muy estable y predecible.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:12px;font-weight:500;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;margin-top:28px;">Para cono 10 reducción</h3>
+  <div class="colorant-wrap">
+    <table class="colorant-table">
+      <thead><tr><th>Colorante</th><th>Cantidad</th><th>Resultado en reducción</th><th>Mecanismo</th></tr></thead>
+      <tbody>
+        <tr><td><span class="color-swatch" style="background:#3C3489"></span>Carbonato de cobalto</td><td>0,3–0,5%</td><td>Azul intenso</td><td style="font-size:12px;color:var(--mid)">El cobalto es estable en reducción — da azul profundo independientemente de la atmósfera.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#7B5EA7"></span>Cobalto + cromo</td><td>0,5% + 0,2%</td><td>Violeta profundo</td><td style="font-size:12px;color:var(--mid)">Misma lógica que en cono 6 pero el color es más saturado a mayor temperatura.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#6B9E6B"></span>Óxido de hierro rojo</td><td>4–6%</td><td>Celadón verde o ámbar</td><td style="font-size:12px;color:var(--mid)">En reducción el Fe₂O₃ se reduce a FeO, que da verde celadón. A más temperatura y más reducción, más verde.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#8B2252"></span>Carbonato de cobre</td><td>0,5–1%</td><td>Rojo sangre de buey*</td><td style="font-size:12px;color:var(--mid)">En reducción el Cu²⁺ se reduce a Cu⁺/Cu⁰ dando el famoso rojo Jun. Muy inestable — fácil que salga negro.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#6B5060"></span>Óxido de manganeso</td><td>1–2%</td><td>Marrón/malva ahumado</td><td style="font-size:12px;color:var(--mid)">En reducción da tonos más oscuros y ahumados que en oxidación. Crea el "smokey" del merlot.</td></tr>
+        <tr><td><span class="color-swatch" style="background:#F0EAF8;border:1px solid #ccc"></span>Sin colorante</td><td>—</td><td>Blanco jade / opalescente</td><td style="font-size:12px;color:var(--mid)">La reducción por sí sola purifica el aspecto del chun y acentúa la separación de fases.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12px;color:var(--mid);font-style:italic;">* El cobre en reducción puede dar rojo espectacular o negro si la reducción es excesiva. Empezar con 0,5% y probar en probeta.</p>
+</section>
+
+<!-- ════════════════════════════════════
+     4. CONSEJOS
+════════════════════════════════════ -->
+<section id="consejos">
+  <div class="section-header">
+    <span class="section-num">4</span>
+    <span class="section-title">Consejos de aplicación</span>
+  </div>
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="tip-title">Grosor y capas</div>
+      <ul class="tip-list">
+        <li>Capa base: 1,5–2 mm de espesor uniforme</li>
+        <li>Capa fluida: solo en mitad o tercio superior</li>
+        <li>Dejar 1,5–2 cm libres en la base de la pieza</li>
+        <li>A cono 10 usar capa más fina (≈1,5 mm)</li>
+        <li>Doble capa: primera capa aún más fina</li>
+      </ul>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">Curva cono 10 reducción</div>
+      <ul class="tip-list">
+        <li>Subida lenta entre 950–1.100 °C</li>
+        <li>Reducción media sostenida desde ~1.000 °C</li>
+        <li>15–20 min de oxidación suave al final</li>
+        <li>La oxidación final saca la opalescencia</li>
+      </ul>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">Arcilla soporte</div>
+      <ul class="tip-list">
+        <li>El chun es más vivo en porcelana o gres blanco</li>
+        <li>En arcillas oscuras el efecto se apaga</li>
+        <li>La opalescencia depende de la base clara</li>
+      </ul>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">Peso específico (aerómetro)</div>
+      <ul class="tip-list">
+        <li>Chun cono 6: 1,38–1,42</li>
+        <li>Chun cono 10: 1,40–1,45</li>
+        <li>Honey Flux: 1,38–1,40 (más diluido)</li>
+        <li>Flux Blossom: 1,40–1,44</li>
+        <li>Iron Lustre: 1,42–1,45 (más denso)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     5. EQUIVALENCIAS
+════════════════════════════════════ -->
+<section id="equivalencias">
+  <div class="section-header">
+    <span class="section-num">5</span>
+    <span class="section-title">Equivalencias europeas de materias primas</span>
+  </div>
+  <p style="font-size:13px;color:var(--mid);margin-bottom:20px;">Proveedores accesibles en España: Sibelco, Keramikos, Comercial Cerámicas.</p>
+  <div class="equiv-wrap">
+    <table class="equiv-table">
+      <thead><tr><th>Nombre americano</th><th>Equivalente europeo</th><th>Diferencia a tener en cuenta</th></tr></thead>
+      <tbody>
+        <tr><td>Custer feldspar</td><td>Microcline Sibelco / G-200 HP</td><td style="font-size:12px;color:var(--mid)">El microcline europeo funde ligeramente más alto — puede necesitar +1–2% de whiting para compensar.</td></tr>
+        <tr><td>F-4 feldspar (sódico)</td><td>Minspar 200</td><td style="font-size:12px;color:var(--mid)">Muy equivalente. Sibelco España lo distribuye directamente.</td></tr>
+        <tr><td>EPK kaolin</td><td>Caolín Grolleg / caolín estándar</td><td style="font-size:12px;color:var(--mid)">El Grolleg es más refractario — aumenta ligeramente la viscosidad del fundido, bueno para control de flujo.</td></tr>
+        <tr><td>Whiting americano</td><td>Carbonato cálcico precipitado</td><td style="font-size:12px;color:var(--mid)">Prácticamente idéntico. Cualquier CaCO₃ cerámico de 325 mesh funciona.</td></tr>
+        <tr><td>Silica 325 mesh</td><td>Sílice cerámica 325 mesh</td><td style="font-size:12px;color:var(--mid)">Sin diferencia. Es SiO₂ puro en ambos casos.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Guía de esmaltes de alta temperatura · efectos fluidos, drips y variegaciones · proporciones en % sobre 100 partes en peso
+</footer>
+
+</body>
+</html>
