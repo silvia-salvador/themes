@@ -1352,108 +1352,193 @@ function renderSpeakingWriting(){
   // Vaughan-style: indirect → direct questions
   // Lógica Vaughan: te diriges DIRECTAMENTE a la persona, así que siempre es "Do you...?",
   // con paréntesis indicando a quién (a él, a ella, a ellos, a nosotros, a mí).
+  
+  
+
   const VAUGHAN_DATA = [
-    {
-      group: "Present Simple", color: "#4a7dbf",
-      note: "Do + you + verbo en infinitivo (te diriges directamente a la persona)",
-      items: [
-        {p: "Ask me if I play any instrument", a: "Do you play any instrument?", to: "a mí"},
-        {p: "Ask him if he speaks French", a: "Do you speak French?", to: "a él"},
-        {p: "Ask her if she lives near here", a: "Do you live near here?", to: "a ella"},
-        {p: "Ask them if they like coffee", a: "Do you like coffee?", to: "a ellos"},
-        {p: "Ask us if we work together", a: "Do you work together?", to: "a nosotros"},
-        {p: "Ask me why I always arrive late", a: "Why do you always arrive late?", to: "a mí"},
-        {p: "Ask him what time he finishes work", a: "What time do you finish work?", to: "a él"}
-      ]
-    },
-    {
-      group: "Present Continuous", color: "#5a9b6f",
-      note: "Are + you + verbo-ing",
-      items: [
-        {p: "Ask me what I'm doing right now", a: "What are you doing right now?", to: "a mí"},
-        {p: "Ask him where he is going", a: "Where are you going?", to: "a él"},
-        {p: "Ask her if she is working from home today", a: "Are you working from home today?", to: "a ella"},
-        {p: "Ask them why they are laughing", a: "Why are you laughing?", to: "a ellos"},
-        {p: "Ask us if we are leaving soon", a: "Are you leaving soon?", to: "a nosotros"}
-      ]
-    },
-    {
-      group: "Past Simple", color: "#c47a5e",
-      note: "Did + you + verbo en infinitivo",
-      items: [
-        {p: "Ask me what I did yesterday", a: "What did you do yesterday?", to: "a mí"},
-        {p: "Ask him if he called you last night", a: "Did you call me last night?", to: "a él"},
-        {p: "Ask her where she went on holiday", a: "Where did you go on holiday?", to: "a ella"},
-        {p: "Ask them when they arrived", a: "When did you arrive?", to: "a ellos"},
-        {p: "Ask us if we enjoyed the film", a: "Did you enjoy the film?", to: "a nosotros"}
-      ]
-    },
-    {
-      group: "Past Continuous", color: "#a87436",
-      note: "Were + you + verbo-ing",
-      items: [
-        {p: "Ask me what I was doing at 8pm", a: "What were you doing at 8pm?", to: "a mí"},
-        {p: "Ask him if he was sleeping when you called", a: "Were you sleeping when I called?", to: "a él"},
-        {p: "Ask her why she was crying", a: "Why were you crying?", to: "a ella"}
-      ]
-    },
-    {
-      group: "Present Perfect", color: "#7a5fa6",
-      note: "Have + you + participio",
-      items: [
-        {p: "Ask me how long I've lived here", a: "How long have you lived here?", to: "a mí"},
-        {p: "Ask him if he has ever been to Japan", a: "Have you ever been to Japan?", to: "a él"},
-        {p: "Ask her what she has done today", a: "What have you done today?", to: "a ella"},
-        {p: "Ask them if they have finished the project", a: "Have you finished the project?", to: "a ellos"}
-      ]
-    },
-    {
-      group: "Past Perfect", color: "#5f6a87",
-      note: "Had + you + participio",
-      items: [
-        {p: "Ask me if I had eaten before the meeting", a: "Had you eaten before the meeting?", to: "a mí"},
-        {p: "Ask him what he had done before joining the company", a: "What had you done before joining the company?", to: "a él"},
-        {p: "Ask her if she had ever seen anything like that", a: "Had you ever seen anything like that?", to: "a ella"}
-      ]
-    },
-    {
-      group: "Future (will)", color: "#3f8baa",
-      note: "Will + you + verbo en infinitivo",
-      items: [
-        {p: "Ask me what I will do tomorrow", a: "What will you do tomorrow?", to: "a mí"},
-        {p: "Ask her if she will come to the party", a: "Will you come to the party?", to: "a ella"},
-        {p: "Ask them when they will arrive", a: "When will you arrive?", to: "a ellos"}
-      ]
-    },
-    {
-      group: "Future (going to)", color: "#2d9c8a",
-      note: "Are + you + going to + verbo",
-      items: [
-        {p: "Ask me what I'm going to do this weekend", a: "What are you going to do this weekend?", to: "a mí"},
-        {p: "Ask him if he is going to apply for the job", a: "Are you going to apply for the job?", to: "a él"},
-        {p: "Ask them where they are going to live next year", a: "Where are you going to live next year?", to: "a ellos"}
-      ]
-    },
-    {
-      group: "Conditional (would)", color: "#b85a8b",
-      note: "Would + you + verbo en infinitivo",
-      items: [
-        {p: "Ask me what I would do if I won the lottery", a: "What would you do if you won the lottery?", to: "a mí"},
-        {p: "Ask her where she would live if she could choose", a: "Where would you live if you could choose?", to: "a ella"},
-        {p: "Ask them if they would help in an emergency", a: "Would you help in an emergency?", to: "a ellos"}
-      ]
-    },
-    {
-      group: "Modales (can / could / should / must)", color: "#7d5a3c",
-      note: "Modal + you + verbo en infinitivo (sin to)",
-      items: [
-        {p: "Ask me if I can swim", a: "Can you swim?", to: "a mí"},
-        {p: "Ask him if he could drive when he was 18", a: "Could you drive when you were 18?", to: "a él"},
-        {p: "Ask her if she should call her boss", a: "Should you call your boss?", to: "a ella"},
-        {p: "Ask them if they must wear a uniform", a: "Must you wear a uniform?", to: "a ellos"}
-      ]
-    }
-  ];
+  {
+    group: "Present Simple",
+    color: "#4a7dbf",
+    note: "Do/Does + pronombre correcto + verbo infinitivo",
+    items: [
+      { p: "Ask me if I play any instrument",              a: "Do you play any instrument?",              note: "I → you" },
+      { p: "Ask him if he speaks French",                  a: "Do you speak French?",                     note: "he → you" },
+      { p: "Ask her if she lives near here",               a: "Do you live near here?",                   note: "she → you" },
+      { p: "Ask them if they like coffee",                 a: "Do you like coffee?",                      note: "they → you" },
+      { p: "Ask us if we work together",                   a: "Do you work together?",                    note: "we → you" },
+      { p: "Ask him if she arrives on time",               a: "Does she arrive on time?",                 note: "pregunta sobre 'she'" },
+      { p: "Ask her if he works here",                     a: "Does he work here?",                       note: "pregunta sobre 'he'" },
+      { p: "Ask me if she lives nearby",                   a: "Does she live nearby?",                    note: "pregunta sobre 'she'" },
+      { p: "Ask them if we start at 9",                    a: "Do we start at 9?",                        note: "pregunta sobre 'we'" },
+      { p: "Ask her if they know the answer",              a: "Do they know the answer?",                 note: "pregunta sobre 'they'" },
+      { p: "Ask me why I always arrive late",              a: "Why do you always arrive late?",           note: "wh- + I → you" },
+      { p: "Ask him what time he finishes work",           a: "What time do you finish work?",            note: "wh- + he → you" },
+      { p: "Ask her where she lives",                      a: "Where do you live?",                       note: "wh- + she → you" },
+      { p: "Ask them how often they exercise",             a: "How often do you exercise?",               note: "wh- + they → you" },
+      { p: "Ask him why she is always late",               a: "Why is she always late?",                  note: "wh- sobre tercera persona" },
+      { p: "Ask me what they eat for breakfast",           a: "What do they eat for breakfast?",          note: "wh- sobre 'they'" },
+    ]
+  },
+  {
+    group: "Present Continuous",
+    color: "#5a9b6f",
+    note: "Am/Is/Are + pronombre + verbo-ing",
+    items: [
+      { p: "Ask me what I am doing right now",               a: "What are you doing right now?",          note: "I → you" },
+      { p: "Ask him where he is going",                      a: "Where are you going?",                   note: "he → you" },
+      { p: "Ask her if she is working from home today",      a: "Are you working from home today?",       note: "she → you" },
+      { p: "Ask them why they are laughing",                 a: "Why are you laughing?",                  note: "they → you" },
+      { p: "Ask us if we are leaving soon",                  a: "Are you leaving soon?",                  note: "we → you" },
+      { p: "Ask her if he is waiting outside",               a: "Is he waiting outside?",                 note: "pregunta sobre 'he'" },
+      { p: "Ask him if she is working late",                 a: "Is she working late?",                   note: "pregunta sobre 'she'" },
+      { p: "Ask me if they are coming to the party",         a: "Are they coming to the party?",          note: "pregunta sobre 'they'" },
+      { p: "Ask them what she is studying",                  a: "What is she studying?",                  note: "pregunta sobre 'she'" },
+      { p: "Ask him if we are meeting tomorrow",             a: "Are we meeting tomorrow?",               note: "pregunta sobre 'we'" },
+    ]
+  },
+  {
+    group: "Past Simple",
+    color: "#c47a5e",
+    note: "Did + pronombre + verbo infinitivo",
+    items: [
+      { p: "Ask me what I did yesterday",                    a: "What did you do yesterday?",             note: "I → you" },
+      { p: "Ask him if he called last night",                a: "Did you call last night?",               note: "he → you" },
+      { p: "Ask her where she went on holiday",              a: "Where did you go on holiday?",           note: "she → you" },
+      { p: "Ask them when they arrived",                     a: "When did you arrive?",                   note: "they → you" },
+      { p: "Ask us if we enjoyed the film",                  a: "Did you enjoy the film?",                note: "we → you" },
+      { p: "Ask him if she passed the exam",                 a: "Did she pass the exam?",                 note: "pregunta sobre 'she'" },
+      { p: "Ask her if he called her yesterday",             a: "Did he call you yesterday?",             note: "he tercero; her → you" },
+      { p: "Ask me if she finished the report",              a: "Did she finish the report?",             note: "pregunta sobre 'she'" },
+      { p: "Ask them if we made a mistake",                  a: "Did we make a mistake?",                 note: "pregunta sobre 'we'" },
+      { p: "Ask him what they said about the project",       a: "What did they say about the project?",  note: "pregunta sobre 'they'" },
+      { p: "Ask her why she didn't come to the meeting",     a: "Why didn't you come to the meeting?",   note: "she → you (negativa)" },
+      { p: "Ask him if she explained it well",               a: "Did she explain it well?",               note: "pregunta sobre 'she'" },
+    ]
+  },
+  {
+    group: "Past Continuous",
+    color: "#a87436",
+    note: "Was/Were + pronombre + verbo-ing",
+    items: [
+      { p: "Ask me what I was doing at 8pm",                 a: "What were you doing at 8pm?",            note: "I → you" },
+      { p: "Ask him if he was sleeping when she called",     a: "Were you sleeping when she called?",     note: "he → you" },
+      { p: "Ask her why she was crying",                     a: "Why were you crying?",                   note: "she → you" },
+      { p: "Ask them what they were talking about",          a: "What were you talking about?",           note: "they → you" },
+      { p: "Ask her if he was working late",                 a: "Was he working late?",                   note: "pregunta sobre 'he'" },
+      { p: "Ask him if she was speaking too fast",           a: "Was she speaking too fast?",             note: "pregunta sobre 'she'" },
+      { p: "Ask me if they were expecting this",             a: "Were they expecting this?",              note: "pregunta sobre 'they'" },
+      { p: "Ask them if she was waiting for us",             a: "Was she waiting for you?",               note: "she tercera; us → you" },
+    ]
+  },
+  {
+    group: "Present Perfect",
+    color: "#7a5fa6",
+    note: "Have/Has + pronombre + participio",
+    items: [
+      { p: "Ask me how long I have lived here",              a: "How long have you lived here?",          note: "I → you" },
+      { p: "Ask him if he has ever been to Japan",           a: "Have you ever been to Japan?",           note: "he → you" },
+      { p: "Ask her what she has done today",                a: "What have you done today?",              note: "she → you" },
+      { p: "Ask them if they have finished the project",     a: "Have you finished the project?",         note: "they → you" },
+      { p: "Ask her if he has called today",                 a: "Has he called today?",                   note: "he tercero" },
+      { p: "Ask him if she has made any progress",           a: "Has she made any progress?",             note: "pregunta sobre 'she'" },
+      { p: "Ask me if she has ever tried sushi",             a: "Has she ever tried sushi?",              note: "she tercera" },
+      { p: "Ask them if we have met before",                 a: "Have we met before?",                    note: "pregunta sobre 'we'" },
+      { p: "Ask him if they have sent the email",            a: "Have they sent the email?",              note: "pregunta sobre 'they'" },
+    ]
+  },
+  {
+    group: "Past Perfect",
+    color: "#5f6a87",
+    note: "Had + pronombre + participio",
+    items: [
+      { p: "Ask me if I had eaten before the meeting",               a: "Had you eaten before the meeting?",              note: "I → you" },
+      { p: "Ask him what he had done before joining the company",    a: "What had you done before joining the company?",  note: "he → you" },
+      { p: "Ask her if she had ever seen anything like that",        a: "Had you ever seen anything like that?",          note: "she → you" },
+      { p: "Ask him if she had already left when he arrived",        a: "Had she already left when you arrived?",         note: "she tercera; he → you" },
+      { p: "Ask her if he had called before the meeting",            a: "Had he called before the meeting?",              note: "he tercero" },
+      { p: "Ask me if they had finished when she arrived",           a: "Had they finished when you arrived?",            note: "they; she → you" },
+    ]
+  },
+  {
+    group: "Future (will)",
+    color: "#3f8baa",
+    note: "Will + pronombre + verbo infinitivo",
+    items: [
+      { p: "Ask me what I will do tomorrow",                 a: "What will you do tomorrow?",             note: "I → you" },
+      { p: "Ask her if she will come to the party",          a: "Will you come to the party?",            note: "she → you" },
+      { p: "Ask them when they will arrive",                 a: "When will you arrive?",                  note: "they → you" },
+      { p: "Ask him if she will be in the office",           a: "Will she be in the office?",             note: "she tercera" },
+      { p: "Ask me if she will call back",                   a: "Will she call back?",                    note: "she tercera" },
+      { p: "Ask her if they will agree",                     a: "Will they agree?",                       note: "pregunta sobre 'they'" },
+      { p: "Ask them if we will have time",                  a: "Will we have time?",                     note: "pregunta sobre 'we'" },
+    ]
+  },
+  {
+    group: "Future (going to)",
+    color: "#2d9c8a",
+    note: "Am/Is/Are + pronombre + going to + verbo",
+    items: [
+      { p: "Ask me what I am going to do this weekend",        a: "What are you going to do this weekend?",   note: "I → you" },
+      { p: "Ask him if he is going to apply for the job",      a: "Are you going to apply for the job?",      note: "he → you" },
+      { p: "Ask them where they are going to live next year",  a: "Where are you going to live next year?",   note: "they → you" },
+      { p: "Ask her if he is going to resign",                 a: "Is he going to resign?",                   note: "he tercero" },
+      { p: "Ask him if she is going to present first",         a: "Is she going to present first?",           note: "she tercera" },
+      { p: "Ask me if they are going to join us",              a: "Are they going to join you?",              note: "they; us → you" },
+      { p: "Ask them if she is going to run the session",      a: "Is she going to run the session?",         note: "she tercera" },
+    ]
+  },
+  {
+    group: "Conditional (would)",
+    color: "#b85a8b",
+    note: "Would + pronombre + verbo infinitivo",
+    items: [
+      { p: "Ask me what I would do if I won the lottery",           a: "What would you do if you won the lottery?",   note: "I → you (doble)" },
+      { p: "Ask her where she would live if she could choose",      a: "Where would you live if you could choose?",   note: "she → you (doble)" },
+      { p: "Ask them if they would help in an emergency",           a: "Would you help in an emergency?",             note: "they → you" },
+      { p: "Ask him if she would accept the offer",                 a: "Would she accept the offer?",                 note: "she tercera" },
+      { p: "Ask her if he would change anything",                   a: "Would he change anything?",                   note: "he tercero" },
+      { p: "Ask me if they would support the plan",                 a: "Would they support the plan?",                note: "pregunta sobre 'they'" },
+      { p: "Ask them if she would be upset",                        a: "Would she be upset?",                         note: "she tercera" },
+    ]
+  },
+  {
+    group: "Modales (can / could / should / must / might)",
+    color: "#7d5a3c",
+    note: "Modal + pronombre + verbo infinitivo (sin to)",
+    items: [
+      { p: "Ask me if I can swim",                           a: "Can you swim?",                          note: "can + I → you" },
+      { p: "Ask her if she can drive",                       a: "Can you drive?",                         note: "can + she → you" },
+      { p: "Ask me if she can join us tomorrow",             a: "Can she join you tomorrow?",             note: "she tercera; us → you" },
+      { p: "Ask him if he could drive when he was 18",       a: "Could you drive when you were 18?",      note: "could + he → you" },
+      { p: "Ask her if he could help her",                   a: "Could he help you?",                     note: "he tercero; her → you" },
+      { p: "Ask them if they could start earlier",           a: "Could you start earlier?",               note: "they → you" },
+      { p: "Ask her if she should call her boss",            a: "Should you call your boss?",             note: "she → you; her → your" },
+      { p: "Ask him if she should apologise",                a: "Should she apologise?",                  note: "she tercera" },
+      { p: "Ask me if they should come to the meeting",      a: "Should they come to the meeting?",       note: "pregunta sobre 'they'" },
+      { p: "Ask them if they must wear a uniform",           a: "Must you wear a uniform?",               note: "they → you" },
+      { p: "Ask him if she might be right",                  a: "Might she be right?",                    note: "she tercera" },
+      { p: "Ask her if he might be wrong",                   a: "Might he be wrong?",                     note: "he tercero" },
+    ]
+  },
+  {
+    group: "Preguntas con objeto (him / her / us / them / me)",
+    color: "#9c6b3c",
+    note: "Cuando la pregunta tiene DOS pronombres — sujeto Y objeto",
+    items: [
+      { p: "Ask her if he called her yesterday",             a: "Did he call you yesterday?",             note: "he tercero; her → you" },
+      { p: "Ask him if she wrote him a message",             a: "Did she write you a message?",           note: "she tercera; him → you" },
+      { p: "Ask me if he told me the truth",                 a: "Did he tell you the truth?",             note: "he tercero; me → you" },
+      { p: "Ask them if we sent them the report",            a: "Did we send you the report?",            note: "we; them → you" },
+      { p: "Ask her if he helped her with the project",      a: "Did he help you with the project?",      note: "he tercero; her → you" },
+      { p: "Ask him if she gave him all the information",    a: "Did she give you all the information?",  note: "she tercera; him → you" },
+      { p: "Ask me if they invited me to the event",         a: "Did they invite you to the event?",      note: "they; me → you" },
+      { p: "Ask them if she called them this morning",       a: "Did she call you this morning?",         note: "she tercera; them → you" },
+      { p: "Ask him if we recommended him for the role",     a: "Did we recommend you for the role?",     note: "we; him → you" },
+      { p: "Ask her if he apologised to her",                a: "Did he apologise to you?",               note: "he tercero; her → you" },
+    ]
+  },
+];
+  
   window.__VAUGHAN_DATA__ = VAUGHAN_DATA;
   const vhTotal = VAUGHAN_DATA.reduce(function(s,g){ return s + g.items.length; }, 0);
   let vh = `<p class="muted">Convierte la pregunta indirecta (estilo Vaughan) en pregunta directa en inglés. Practica todos los tiempos verbales y personas: <em>me, him, her, them, us</em>.</p>
@@ -1540,6 +1625,7 @@ window.vhRandom = function(){
   const box = document.getElementById('vh-random');
   if(!box) return;
   const escTxt = s => String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  
   box.innerHTML = `<div class="card" style="border-left:4px solid ${g.color};margin:8px 0;background:var(--paper)">
     <div class="small" style="margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">${g.group}</div>
     <div style="font-size:15px;font-weight:600">▸ ${escTxt(it.p)}</div>
