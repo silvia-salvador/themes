@@ -1230,6 +1230,7 @@ function renderSpeakingWriting(){
       <button class="stb" data-t="aptis">APTIS Speaking</button>
       <button class="stb" data-t="tips">Tips Speaking</button>
       <button class="stb" data-t="vaughan">Vaughan</button>
+      <button class="stb" data-t="indirect">Preguntas indirectas</button>
       <button class="stb" data-t="spfull">Speaking APT (completo)</button>
       <button class="stb" data-t="wfull">Writing APT (completo)</button>
     </div>
@@ -1241,6 +1242,7 @@ function renderSpeakingWriting(){
     <div class="panel" id="sw-aptis"></div>
     <div class="panel" id="sw-tips"></div>
     <div class="panel" id="sw-vaughan"></div>
+    <div class="panel" id="sw-indirect"></div>
     <div class="panel" id="sw-spfull"></div>
     <div class="panel" id="sw-wfull"></div>
   `;
@@ -1352,9 +1354,7 @@ function renderSpeakingWriting(){
   // Vaughan-style: indirect → direct questions
   // Lógica Vaughan: te diriges DIRECTAMENTE a la persona, así que siempre es "Do you...?",
   // con paréntesis indicando a quién (a él, a ella, a ellos, a nosotros, a mí).
-  
-  
-
+   
   const VAUGHAN_DATA = [
   {
     group: "Present Simple",
@@ -1538,6 +1538,213 @@ function renderSpeakingWriting(){
     ]
   },
 ];
+
+const INDIRECT_Q_DATA = [
+  {
+    group: "Información básica (lugar, tiempo, modo)",
+    color: "#4a7dbf",
+    intro: "Las más comunes en situaciones cotidianas. Frase introductoria + orden normal de oración.",
+    items: [
+      { direct: "Where is the nearest bank?",              intro: "Could you tell me",        a: "Could you tell me where the nearest bank is?",              note: "where + S + V (no inversión)" },
+      { direct: "What time does the film start?",          intro: "Do you know",              a: "Do you know what time the film starts?",                    note: "what time + S + V" },
+      { direct: "How long does the journey take?",         intro: "Could you tell me",        a: "Could you tell me how long the journey takes?",             note: "how long + S + V" },
+      { direct: "Where do I need to go?",                  intro: "Can you tell me",          a: "Can you tell me where I need to go?",                       note: "where + S + V" },
+      { direct: "What does this word mean?",               intro: "Do you know",              a: "Do you know what this word means?",                         note: "what + S + V" },
+      { direct: "How much does it cost?",                  intro: "Could you tell me",        a: "Could you tell me how much it costs?",                      note: "how much + S + V" },
+      { direct: "When does the next train leave?",         intro: "Do you know",              a: "Do you know when the next train leaves?",                   note: "when + S + V" },
+      { direct: "Where can I find a taxi?",                intro: "Could you tell me",        a: "Could you tell me where I can find a taxi?",                note: "where + S + can (modal no invierte)" },
+      { direct: "How do I get to the city centre?",        intro: "Would you mind telling me",a: "Would you mind telling me how I get to the city centre?",   note: "how + S + V" },
+      { direct: "What floor is the meeting room on?",      intro: "Do you know",              a: "Do you know what floor the meeting room is on?",            note: "preposición al final" },
+    ]
+  },
+  {
+    group: "Yes / No — if / whether",
+    color: "#5a9b6f",
+    intro: "Cuando la pregunta directa es de sí/no, la indirecta necesita 'if' o 'whether'.",
+    items: [
+      { direct: "Is she coming to the meeting?",           intro: "Do you know",              a: "Do you know if she is coming to the meeting?",              note: "is she → if she is" },
+      { direct: "Has he called yet?",                      intro: "I wonder",                 a: "I wonder if he has called yet.",                            note: "has he → if he has" },
+      { direct: "Will they be on time?",                   intro: "I'm not sure",             a: "I'm not sure whether they will be on time.",                note: "will they → whether they will" },
+      { direct: "Does she speak Spanish?",                 intro: "Do you know",              a: "Do you know if she speaks Spanish?",                        note: "does she → if she speaks" },
+      { direct: "Can he drive?",                           intro: "I wonder",                 a: "I wonder if he can drive.",                                 note: "can he → if he can (modal)" },
+      { direct: "Did they receive the email?",             intro: "Do you know",              a: "Do you know if they received the email?",                   note: "did they → if they received" },
+      { direct: "Is the office open on Saturdays?",        intro: "Could you tell me",        a: "Could you tell me if the office is open on Saturdays?",     note: "is the office → if the office is" },
+      { direct: "Has the decision been made?",             intro: "I have no idea",           a: "I have no idea whether the decision has been made.",        note: "pasiva; has it → whether it has" },
+      { direct: "Were they informed in advance?",          intro: "Do you know",              a: "Do you know if they were informed in advance?",             note: "were they → if they were" },
+      { direct: "Will the project be finished by Friday?", intro: "I'm not sure",             a: "I'm not sure whether the project will be finished by Friday.", note: "will it → whether it will" },
+      { direct: "Should I send the report today?",         intro: "Do you know",              a: "Do you know if I should send the report today?",            note: "modal + sujeto primero" },
+      { direct: "Could she come earlier?",                 intro: "I wonder",                 a: "I wonder if she could come earlier.",                       note: "could she → if she could" },
+    ]
+  },
+  {
+    group: "Situaciones formales — trabajo y reuniones",
+    color: "#7a5fa6",
+    intro: "En contextos profesionales las indirectas son casi obligatorias. Suenan más educadas y menos directas.",
+    items: [
+      { direct: "When will the results be ready?",         intro: "Could you let me know",    a: "Could you let me know when the results will be ready?",     note: "when + S + will (modal no invierte)" },
+      { direct: "Who is responsible for this project?",    intro: "Do you know",              a: "Do you know who is responsible for this project?",          note: "who + V (who es sujeto, no invierte)" },
+      { direct: "Why was the meeting cancelled?",          intro: "Could you explain",        a: "Could you explain why the meeting was cancelled?",          note: "why + S + V pasiva" },
+      { direct: "What are the next steps?",                intro: "I'd like to know",         a: "I'd like to know what the next steps are.",                 note: "what + S + V" },
+      { direct: "How many people attended the conference?",intro: "Do you know",              a: "Do you know how many people attended the conference?",      note: "how many + S + V" },
+      { direct: "When does the contract expire?",          intro: "Could you tell me",        a: "Could you tell me when the contract expires?",              note: "when + S + V" },
+      { direct: "Who made this decision?",                 intro: "I'd like to understand",   a: "I'd like to understand who made this decision.",            note: "who es sujeto — no cambia orden" },
+      { direct: "What does this clause mean?",             intro: "Could you clarify",        a: "Could you clarify what this clause means?",                 note: "what + S + V" },
+      { direct: "Has the budget been approved?",           intro: "Do you know",              a: "Do you know if the budget has been approved?",              note: "yes/no → if" },
+      { direct: "Why haven't they responded yet?",         intro: "I wonder",                 a: "I wonder why they haven't responded yet.",                  note: "why + S + V negativa" },
+      { direct: "How should we proceed?",                  intro: "Could you advise us on",   a: "Could you advise us on how we should proceed?",             note: "how + S + modal" },
+      { direct: "When will we receive the feedback?",      intro: "I'd be grateful if you could tell me", a: "I'd be grateful if you could tell me when we will receive the feedback.", note: "fórmula muy formal" },
+    ]
+  },
+  {
+    group: "Situaciones cotidianas — tiendas, restaurantes, viajes",
+    color: "#c47a5e",
+    intro: "Las indirectas suenan más amables cuando pides ayuda a desconocidos.",
+    items: [
+      { direct: "Where are the changing rooms?",           intro: "Could you tell me",        a: "Could you tell me where the changing rooms are?",           note: "where + S + V" },
+      { direct: "Does this come in a larger size?",        intro: "I was wondering",          a: "I was wondering if this comes in a larger size.",           note: "pasado continuo = más suave" },
+      { direct: "Is this seat taken?",                     intro: "I wonder",                 a: "I wonder if this seat is taken.",                           note: "yes/no → if" },
+      { direct: "What time do you close?",                 intro: "Could you tell me",        a: "Could you tell me what time you close?",                    note: "what time + S + V" },
+      { direct: "Is there a vegetarian option?",           intro: "I'd like to know",         a: "I'd like to know if there is a vegetarian option.",         note: "yes/no → if" },
+      { direct: "How long is the wait?",                   intro: "Could you tell me",        a: "Could you tell me how long the wait is?",                   note: "how long + S + V" },
+      { direct: "Where do I check in?",                    intro: "Could you tell me",        a: "Could you tell me where I check in?",                       note: "where + S + V" },
+      { direct: "Is the museum open on Mondays?",          intro: "Do you know",              a: "Do you know if the museum is open on Mondays?",             note: "yes/no → if" },
+      { direct: "What platform does the train leave from?",intro: "Could you tell me",        a: "Could you tell me what platform the train leaves from?",    note: "preposición al final" },
+      { direct: "How far is it to the beach?",             intro: "Do you know",              a: "Do you know how far it is to the beach?",                   note: "how far + S + V" },
+      { direct: "Can I exchange this without a receipt?",  intro: "I was wondering",          a: "I was wondering if I could exchange this without a receipt.", note: "can → could (más formal)" },
+      { direct: "Where should I wait for the bus?",        intro: "Could you tell me",        a: "Could you tell me where I should wait for the bus?",        note: "where + S + modal" },
+    ]
+  },
+  {
+    group: "I was wondering — la más suave de todas",
+    color: "#2d9c8a",
+    intro: "'I was wondering' es la fórmula más cortés. Siempre va seguida de if/whether o wh-word + orden normal.",
+    items: [
+      { direct: "Could you help me with this?",            intro: "I was wondering",          a: "I was wondering if you could help me with this.",           note: "could you → if you could" },
+      { direct: "Is this the right form to fill in?",      intro: "I was wondering",          a: "I was wondering if this is the right form to fill in.",     note: "yes/no → if" },
+      { direct: "Would you be available on Friday?",       intro: "I was wondering",          a: "I was wondering if you would be available on Friday.",      note: "would you → if you would" },
+      { direct: "Could we move the deadline?",             intro: "I was wondering",          a: "I was wondering if we could move the deadline.",            note: "could we → if we could" },
+      { direct: "What would you recommend?",               intro: "I was wondering",          a: "I was wondering what you would recommend.",                 note: "what + S + V" },
+      { direct: "Is there anything I can do to help?",     intro: "I was wondering",          a: "I was wondering if there is anything I can do to help.",    note: "yes/no → if" },
+      { direct: "Have you had a chance to review it?",     intro: "I was wondering",          a: "I was wondering if you have had a chance to review it.",    note: "have you → if you have" },
+      { direct: "Would it be possible to reschedule?",     intro: "I was wondering",          a: "I was wondering if it would be possible to reschedule.",    note: "would it → if it would" },
+      { direct: "Could you send me the report?",           intro: "I was wondering",          a: "I was wondering if you could send me the report.",          note: "could you → if you could" },
+      { direct: "Do you have any experience with this?",   intro: "I was wondering",          a: "I was wondering if you have any experience with this.",     note: "do you → if you have" },
+    ]
+  },
+  {
+    group: "Pasado — preguntas sobre lo que ocurrió",
+    color: "#a87436",
+    intro: "Cuando la pregunta directa está en pasado, el orden sigue la misma regla — nunca inversión.",
+    items: [
+      { direct: "Where did she go after the meeting?",     intro: "Do you know",              a: "Do you know where she went after the meeting?",             note: "where + S + V pasado" },
+      { direct: "Why did he leave so early?",              intro: "I wonder",                 a: "I wonder why he left so early.",                            note: "why + S + V pasado" },
+      { direct: "What happened at the conference?",        intro: "Could you tell me",        a: "Could you tell me what happened at the conference?",        note: "what + V (what es sujeto)" },
+      { direct: "Who called while I was out?",             intro: "Do you know",              a: "Do you know who called while you were out?",                note: "who es sujeto; I → you" },
+      { direct: "How long did the presentation last?",     intro: "Do you remember",          a: "Do you remember how long the presentation lasted?",         note: "how long + S + V pasado" },
+      { direct: "When did they sign the contract?",        intro: "Do you know",              a: "Do you know when they signed the contract?",                note: "when + S + V pasado" },
+      { direct: "What did she say exactly?",               intro: "Could you tell me",        a: "Could you tell me what she said exactly?",                  note: "what + S + V pasado" },
+      { direct: "Why wasn't he at the meeting?",           intro: "I wonder",                 a: "I wonder why he wasn't at the meeting.",                    note: "negativa: why + S + wasn't" },
+      { direct: "How did they find out?",                  intro: "I have no idea",           a: "I have no idea how they found out.",                        note: "how + S + V pasado" },
+      { direct: "Who was in charge of the event?",         intro: "Do you know",              a: "Do you know who was in charge of the event?",              note: "who es sujeto" },
+    ]
+  },
+  {
+    group: "Futuro y planes",
+    color: "#3f8baa",
+    intro: "Con will, going to y present continuous para planes. El modal o auxiliar no invierte.",
+    items: [
+      { direct: "When will the new system be launched?",   intro: "Do you know",              a: "Do you know when the new system will be launched?",         note: "when + S + will" },
+      { direct: "Who is going to lead the project?",       intro: "Do you know",              a: "Do you know who is going to lead the project?",             note: "who es sujeto" },
+      { direct: "What time are they arriving?",            intro: "Do you know",              a: "Do you know what time they are arriving?",                  note: "what time + S + V continuo" },
+      { direct: "Will there be a test next week?",         intro: "I wonder",                 a: "I wonder if there will be a test next week.",               note: "yes/no → if; there will be" },
+      { direct: "Where is the event going to be held?",    intro: "Could you tell me",        a: "Could you tell me where the event is going to be held?",    note: "where + S + going to" },
+      { direct: "How long will the renovation take?",      intro: "Do you have any idea",     a: "Do you have any idea how long the renovation will take?",   note: "how long + S + will" },
+      { direct: "Is she going to apply for the position?", intro: "I wonder",                 a: "I wonder if she is going to apply for the position.",       note: "yes/no → if" },
+      { direct: "When are they going to make a decision?", intro: "I'd like to know",         a: "I'd like to know when they are going to make a decision.",  note: "when + S + going to" },
+    ]
+  },
+  {
+    group: "Errores comunes — elige la correcta",
+    color: "#b85a8b",
+    intro: "El error más frecuente es mantener el orden de pregunta. Identifica la forma correcta.",
+    items: [
+      {
+        direct: "Could you tell me where IS the station?",
+        intro: "—",
+        a: "Could you tell me where the station IS.",
+        wrong: "Could you tell me where IS the station?",
+        note: "nunca inversión después de where/what/when etc."
+      },
+      {
+        direct: "Do you know what time DOES it start?",
+        intro: "—",
+        a: "Do you know what time it starts?",
+        wrong: "Do you know what time does it start?",
+        note: "does desaparece — el verbo toma la forma correcta"
+      },
+      {
+        direct: "I wonder if IS she coming.",
+        intro: "—",
+        a: "I wonder if she is coming.",
+        wrong: "I wonder if is she coming.",
+        note: "después de if: sujeto primero, luego verbo"
+      },
+      {
+        direct: "Can you tell me where did he go?",
+        intro: "—",
+        a: "Can you tell me where he went?",
+        wrong: "Can you tell me where did he go?",
+        note: "did desaparece — verbo en pasado simple"
+      },
+      {
+        direct: "Do you know if will they come?",
+        intro: "—",
+        a: "Do you know if they will come?",
+        wrong: "Do you know if will they come?",
+        note: "después de if: S + will (no inversión)"
+      },
+      {
+        direct: "I'd like to know why did she leave.",
+        intro: "—",
+        a: "I'd like to know why she left.",
+        wrong: "I'd like to know why did she leave.",
+        note: "did desaparece — verbo en pasado"
+      },
+      {
+        direct: "Could you tell me how much does it cost?",
+        intro: "—",
+        a: "Could you tell me how much it costs?",
+        wrong: "Could you tell me how much does it cost?",
+        note: "does desaparece — verbo con -s en tercera persona"
+      },
+      {
+        direct: "I wonder where are they going.",
+        intro: "—",
+        a: "I wonder where they are going.",
+        wrong: "I wonder where are they going.",
+        note: "are they → they are (orden normal)"
+      },
+    ]
+  },
+  {
+    group: "Frases introductorias — nivel avanzado C1",
+    color: "#9c6b3c",
+    intro: "A nivel C1 se esperan fórmulas introductorias más variadas y sofisticadas.",
+    items: [
+      { direct: "What are the main risks involved?",       intro: "I'd be interested to know",       a: "I'd be interested to know what the main risks are.",              note: "fórmula C1 formal" },
+      { direct: "Why has the situation changed?",          intro: "It's not entirely clear to me",   a: "It's not entirely clear to me why the situation has changed.",    note: "negativa + wh-" },
+      { direct: "Who will benefit from this policy?",      intro: "It remains to be seen",           a: "It remains to be seen who will benefit from this policy.",        note: "it remains to be seen + wh-" },
+      { direct: "How can this be justified?",              intro: "One might ask",                   a: "One might ask how this can be justified.",                        note: "one might ask — muy formal" },
+      { direct: "What exactly happened that night?",       intro: "Nobody knows for certain",        a: "Nobody knows for certain what exactly happened that night.",      note: "nobody knows + wh-" },
+      { direct: "Will this approach work in the long run?",intro: "It is debatable",                 a: "It is debatable whether this approach will work in the long run.",note: "it is debatable whether" },
+      { direct: "Why do some people resist change?",       intro: "It is worth considering",         a: "It is worth considering why some people resist change.",          note: "it is worth + wh-" },
+      { direct: "How far has the situation improved?",     intro: "It is difficult to assess",       a: "It is difficult to assess how far the situation has improved.",   note: "it is difficult to + wh-" },
+      { direct: "What impact will AI have on jobs?",       intro: "There is much debate about",      a: "There is much debate about what impact AI will have on jobs.",    note: "about + wh-" },
+      { direct: "Whether the plan will succeed",           intro: "There is no way of knowing",      a: "There is no way of knowing whether the plan will succeed.",       note: "no way of knowing + whether" },
+    ]
+  },
+];
+  
   
   window.__VAUGHAN_DATA__ = VAUGHAN_DATA;
   const vhTotal = VAUGHAN_DATA.reduce(function(s,g){ return s + g.items.length; }, 0);
@@ -1585,6 +1792,104 @@ function renderSpeakingWriting(){
   p.querySelector('#sw-wfull').innerHTML = '<div class="apt-imp">' + HTML_APT_WRITING + '</div>';
   setTimeout(function(){ activateAptTabs(p.querySelector('#sw-spfull'), 'spTab'); }, 30);
   setTimeout(function(){ activateAptTabs(p.querySelector('#sw-wfull'), 'wTab'); }, 30);
+  
+  // ── INDIRECT QUESTIONS ──
+const totalIndirect = INDIRECT_Q_DATA.reduce((s,g) => s + g.items.length, 0);
+let iq = `
+  <p class="muted">Transforma preguntas directas en indirectas. ${totalIndirect} ejercicios · ${INDIRECT_Q_DATA.length} grupos temáticos.</p>
+  <div class="card" style="background:var(--accent-soft);border-left:3px solid var(--accent)">
+    <strong>📌 Reglas clave</strong>
+    <ul style="padding-left:20px;font-size:13.5px;margin-top:8px;line-height:1.9">
+      <li><strong>Nunca inversión</strong> después de la frase introductoria: <em>where the station IS</em>, no <em>where IS the station</em>.</li>
+      <li><strong>Do/does/did desaparecen</strong>: <em>what time it starts</em>, no <em>what time does it start</em>.</li>
+      <li><strong>Yes/No → if / whether</strong>: <em>I wonder if she is coming</em>.</li>
+      <li><strong>Who/what como sujeto</strong> no cambian el orden: <em>Do you know who made this decision?</em></li>
+      <li><strong>Los modales no invierten</strong>: <em>where I can find…</em>, no <em>where can I find…</em></li>
+    </ul>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0;align-items:center">
+    <button class="btn" onclick="iqReveal(true)">👁 Mostrar todas</button>
+    <button class="btn sec" onclick="iqReveal(false)">🙈 Ocultar todas</button>
+    <button class="btn acc" onclick="iqRandom()">🎲 Una al azar</button>
+  </div>
+  <div id="iq-random" style="margin:8px 0"></div>
+`;
+
+INDIRECT_Q_DATA.forEach(function(g, gi) {
+  iq += `<div class="card" style="border-left:4px solid ${g.color};margin-bottom:14px">
+    <h3 style="margin-bottom:4px">${g.group}</h3>
+    <p class="small" style="margin-bottom:12px;font-style:italic">${g.intro}</p>`;
+
+  g.items.forEach(function(it, ii) {
+    const id = 'iq-' + gi + '-' + ii;
+    if (it.wrong) {
+      // Error correction format
+      iq += `<div style="margin:8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:6px">
+        <div style="font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Encuentra el error y corrígelo</div>
+        <div style="font-size:13.5px"><strong style="color:var(--bad)">✗</strong> ${esc(it.wrong)}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn sec iq-btn" style="padding:3px 10px;font-size:11.5px" onclick="iqToggle('${id}',this)">Ver corrección</button>
+          <div id="${id}" class="ex iq-ans" style="display:none;margin:0;flex:1;min-width:200px">
+            <strong style="color:var(--good)">✓</strong> ${esc(it.a)}
+            <span style="color:var(--mute);font-style:italic;font-weight:400"> — ${esc(it.note||'')}</span>
+          </div>
+        </div>
+      </div>`;
+    } else {
+      // Standard format
+      iq += `<div style="margin:8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:6px">
+        <div style="font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${esc(it.intro||'')}</div>
+        <div style="font-size:13.5px"><strong>▸</strong> ${esc(it.direct)}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn sec iq-btn" style="padding:3px 10px;font-size:11.5px" onclick="iqToggle('${id}',this)">Ver respuesta</button>
+          <div id="${id}" class="ex iq-ans" style="display:none;margin:0;flex:1;min-width:200px">
+            → ${esc(it.a)}
+            <span style="color:var(--mute);font-style:italic;font-weight:400"> (${esc(it.note||'')})</span>
+          </div>
+        </div>
+      </div>`;
+    }
+  });
+
+  iq += `</div>`;
+});
+
+p.querySelector('#sw-indirect').innerHTML = iq;
+
+window.iqToggle = function(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const hidden = el.style.display === 'none' || !el.style.display;
+  el.style.display = hidden ? 'block' : 'none';
+  if (btn) btn.textContent = hidden ? 'Ocultar' : 'Ver respuesta';
+};
+
+window.iqReveal = function(show) {
+  document.querySelectorAll('#sw-indirect .iq-ans').forEach(el => { el.style.display = show ? 'block' : 'none'; });
+  document.querySelectorAll('#sw-indirect .iq-btn').forEach(b => { b.textContent = show ? 'Ocultar' : 'Ver respuesta'; });
+};
+
+window.iqRandom = function() {
+  const all = [];
+  INDIRECT_Q_DATA.forEach(function(g) { g.items.forEach(function(it) { all.push({ it, color: g.color, group: g.group }); }); });
+  const pick = all[Math.floor(Math.random() * all.length)];
+  const box = document.getElementById('iq-random');
+  if (!box) return;
+  box.innerHTML = `<div class="card" style="border-left:4px solid ${pick.color};margin:8px 0">
+    <div class="small" style="margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">${esc(pick.group)}</div>
+    ${pick.it.wrong
+      ? `<div style="font-size:12px;color:var(--mute);margin-bottom:4px">Encuentra el error:</div>
+         <div style="font-size:15px;font-weight:600;color:var(--bad)">✗ ${esc(pick.it.wrong)}</div>`
+      : `<div style="font-size:12px;color:var(--mute);margin-bottom:4px">${esc(pick.it.intro||'')}</div>
+         <div style="font-size:15px;font-weight:600">▸ ${esc(pick.it.direct)}</div>`
+    }
+    <button class="btn" style="margin-top:10px" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">Ver respuesta</button>
+    <div class="ex" style="display:none;margin-top:8px">
+      ✓ ${esc(pick.it.a)}
+      <span style="color:var(--mute);font-style:italic"> (${esc(pick.it.note||'')})</span>
+    </div>
+  </div>`;
+};
 }
 window.spRandom = function(){
   const arr = APP_DATA.SPEAKING_TOPICS;
