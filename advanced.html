@@ -677,22 +677,22 @@ function renderGrammar(){
   p.innerHTML = `
     <div class="h-sec">
       <h1>Gramática — C1 / C2</h1>
-      <p>10 grandes bloques de estructura avanzada, fusionando el libro Activate C1, la referencia rápida, el programa APTIS C1/C2 y el decisor de tiempos verbales.</p>
+      <p>Decisor de tiempos verbales, gramática general (Activate C1), referencia general, estructuras Pro APTIS, reported speech y la unidad Yet/Already/Still/Anymore. <em>El plan de 8 semanas está ahora en <strong>Plan → Temario semanal</strong>.</em></p>
     </div>
     <div class="subtabs" id="gr-tabs">
-      <button class="stb on" data-tab="adv">Avanzada APTIS</button>
-      <button class="stb" data-tab="tense">Tiempos verbales</button>
-      <button class="stb" data-tab="units">Unidades Activate C1</button>
-      <button class="stb" data-tab="ref">Referencia rápida</button>
-      <button class="stb" data-tab="pro">Pro Grammar C1+ APT</button>
-      <button class="stb" data-tab="rs">Reported Speech APT</button>
+      <button class="stb on" data-tab="tense">Tiempos verbales</button>
+      <button class="stb" data-tab="units">General Grammar</button>
+      <button class="stb" data-tab="ref">Referencia general</button>
+      <button class="stb" data-tab="pro">Pro Grammar (APTIS)</button>
+      <button class="stb" data-tab="rs">Reported Speech</button>
+      <button class="stb" data-tab="ysa">Yet / Already / Still / Anymore</button>
     </div>
-    <div class="panel on" id="gr-adv"></div>
-    <div class="panel" id="gr-tense"></div>
+    <div class="panel on" id="gr-tense"></div>
     <div class="panel" id="gr-units"></div>
     <div class="panel" id="gr-ref"></div>
     <div class="panel" id="gr-pro"></div>
     <div class="panel" id="gr-rs"></div>
+    <div class="panel" id="gr-ysa"></div>
   `;
   // Hook tabs
   p.querySelectorAll('#gr-tabs .stb').forEach(b => b.onclick = () => {
@@ -700,22 +700,6 @@ function renderGrammar(){
     b.classList.add('on');
     p.querySelectorAll('.panel').forEach(x => x.classList.toggle('on', x.id === 'gr-'+b.dataset.tab));
   });
-  // ---- ADV (aptis_grammar weeks) ----
-  const adv = p.querySelector('#gr-adv');
-  // Embed the original week blocks (with their own structure)
-  adv.innerHTML = `<p class="muted" style="margin-bottom:14px">Programa de 8 semanas — Inversión, condicionales mixtas, cleft, relative clauses, modales avanzados, subjuntivo, discourse markers, integración.</p>` +
-    HTML_GRAMMAR_WEEKS.map(html => `<div class="gw-card">${html}</div>`).join('') +
-    `<h2 class="h-sub">Resumen por semana</h2>` +
-    APP_DATA.GRAMMAR_WEEKS.map(w => `
-      <div class="gw-card">
-        <div class="gw-h">
-          <div class="gw-num">${w.num}</div>
-          <div class="gw-meta"><h2>${w.title}</h2><span class="theme">${w.theme}</span></div>
-        </div>
-        ${w.days.map(d => `<div class="gw-day"><b>${d.d} — ${d.t}</b><br>${d.ex}</div>`).join('')}
-      </div>
-    `).join('');
-
   // ---- TENSE (from hub.TENSE_DATA + interactive decider) ----
   const tn = p.querySelector('#gr-tense');
   tn.innerHTML = renderTenseContent();
@@ -741,9 +725,9 @@ function renderGrammar(){
   `).join('');
   un.querySelectorAll('.unit-h').forEach(h => h.onclick = () => h.parentElement.classList.toggle('open'));
 
-  // ---- REF (ref.GRAMMAR units) ----
+  // ---- REF (ref.GRAMMAR units) — filtrar G4 que está en su propia pestaña Reported Speech ----
   const rf = p.querySelector('#gr-ref');
-  rf.innerHTML = APP_DATA.REF_GRAMMAR.map((u,i) => `
+  rf.innerHTML = `<p class="muted" style="margin-bottom:14px">8 fichas de referencia general (G1, G2, G3, G5–G9). Reported Speech (G4) tiene su propia pestaña.</p>` + APP_DATA.REF_GRAMMAR.filter(u => u.id !== 'G4').map((u,i) => `
     <div class="unit" data-i="${i}">
       <div class="unit-h"><div class="unit-n">${u.id}</div><div><div class="unit-t">${u.title}</div><div class="unit-sub">${u.subtitle||''} · ${u.units||''}</div></div><span class="unit-arrow">▾</span></div>
       <div class="unit-body">
@@ -763,6 +747,107 @@ function renderGrammar(){
   // Reported Speech full tables (recovered)
   p.querySelector('#gr-rs').innerHTML = '<div class="apt-imp">' + HTML_APT_REPORTED + '</div>';
   setTimeout(() => activateAptTabs(p.querySelector('#gr-rs'), 'rsTab'), 30);
+
+  // ---- YSA: Yet / Already / Still / Anymore (formato Maverick GP-0081) ----
+  const ysaPairs = [
+    {es: "Ella aún no ha terminado su tarea.", en: "She hasn't finished her homework <strong>yet</strong>."},
+    {es: "Ella todavía está estudiando para el examen.", en: "She's <strong>still</strong> studying for the exam."},
+    {es: "¿Ya han llegado a la fiesta?", en: "Have they arrived at the party <strong>yet</strong>?"},
+    {es: "¿Todavía está trabajando en el proyecto?", en: "Is he <strong>still</strong> working on the project?"},
+    {es: "Él aún no me ha devuelto la llamada.", en: "He hasn't called me back <strong>yet</strong>."},
+    {es: "Todavía están esperando el autobús.", en: "They're <strong>still</strong> waiting for the bus."},
+    {es: "Aún no han tomado una decisión.", en: "They haven't made a decision <strong>yet</strong>."},
+    {es: "A ella todavía le encanta tocar el piano.", en: "She <strong>still</strong> loves playing the piano."},
+    {es: "Ella ya ha leído ese libro.", en: "She's <strong>already</strong> read that book."},
+    {es: "Ya no como comida rápida.", en: "I don't eat fast food <strong>anymore</strong>."},
+    {es: "¿Ya has cenado?", en: "Have you <strong>already</strong> eaten dinner?"},
+    {es: "¿Ya no van a ese café?", en: "Do they go to that café <strong>anymore</strong>?"},
+    {es: "Él ya ha terminado la tarea.", en: "He's <strong>already</strong> completed the assignment."},
+    {es: "Él ya no juega videojuegos.", en: "He doesn't play video games <strong>anymore</strong>."},
+    {es: "Ya se han ido al concierto.", en: "They've <strong>already</strong> left for the concert."},
+    {es: "Ella ya no vive en esa ciudad.", en: "She doesn't live in that city <strong>anymore</strong>."}
+  ];
+  const ysaRowHtml = (r) => `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:6px;background:var(--paper);font-size:13px"><div style="padding:8px 12px;border-right:1px solid var(--line);color:var(--ink-soft)">${r.es}</div><div style="padding:8px 12px;color:var(--accent)">${r.en}</div></div>`;
+  const ysaColLeft = ysaPairs.slice(0, 8).map(ysaRowHtml).join('');
+  const ysaColRight = ysaPairs.slice(8).map(ysaRowHtml).join('');
+
+  p.querySelector('#gr-ysa').innerHTML = `
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+      <span class="small" style="color:var(--accent);letter-spacing:2px;font-weight:600">GP-0081</span>
+      <h2 class="h-sub" style="border:none;margin:0;padding:0">Yet, already, still, anymore</h2>
+    </div>
+    <p class="muted" style="margin-bottom:16px">Adverbios de tiempo que se usan en inglés para expresar diferentes conceptos relacionados con el tiempo y el estado de las acciones.</p>
+
+    <div class="ysa-grid" style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);gap:18px;align-items:start;margin-bottom:18px">
+      <div>
+        <div class="card">
+          <h3 style="color:var(--accent);font-family:var(--serif)">Yet</h3>
+          <p>Se usa para indicar que algo se espera que ocurra en el futuro, pero <strong>aún no ha sucedido</strong> en el momento presente. También se utiliza en preguntas negativas e interrogativas para preguntar si algo ha sucedido hasta ahora. <strong>Siempre al final de la frase.</strong> Se traduce por <em>ya</em> en preguntas y <em>aún/todavía</em> en frases negativas.</p>
+          <div class="ex">Ella aún no ha terminado su tarea. — She hasn't finished her homework <strong>yet</strong>.</div>
+          <div class="ex">¿Has almorzado ya? — Have you eaten lunch <strong>yet</strong>?</div>
+        </div>
+
+        <div class="card">
+          <h3 style="color:var(--accent);font-family:var(--serif)">Already</h3>
+          <p>Se utiliza para indicar que algo ha sucedido <strong>antes de lo esperado</strong> o antes de un momento específico en el pasado o presente. Se traduce por <em>ya</em> en frases afirmativas y se coloca <strong>delante del verbo principal</strong> y <strong>siempre detrás del verbo <em>to be</em></strong>.</p>
+          <div class="ex">Él ya ha visto esa película. — He has <strong>already</strong> seen that movie.</div>
+          <div class="ex">Ya se han ido al aeropuerto. — They've <strong>already</strong> left for the airport.</div>
+        </div>
+
+        <div class="card">
+          <h3 style="color:var(--accent);font-family:var(--serif)">Still</h3>
+          <p>Se usa para indicar que algo <strong>continúa en el presente y no ha cambiado</strong>. Se traduce por <em>todavía</em> en preguntas y frases afirmativas. Se coloca <strong>delante del verbo principal</strong> y <strong>siempre detrás del verbo <em>to be</em></strong>.</p>
+          <div class="ex">Ella todavía está leyendo el libro. — She is <strong>still</strong> reading the book.</div>
+          <div class="ex">Todavía están trabajando en el proyecto. — They are <strong>still</strong> working on the project.</div>
+        </div>
+
+        <div class="card">
+          <h3 style="color:var(--accent);font-family:var(--serif)">Anymore</h3>
+          <p>Se utiliza en oraciones <strong>negativas e interrogativas</strong> para indicar que una acción que solía ocurrir en el pasado <strong>ya no sucede</strong> en el presente. Se traduce por <em>ya no</em> y va siempre <strong>al final de la frase</strong>.</p>
+          <div class="ex">Ya no veo televisión. — I don't watch TV <strong>anymore</strong>.</div>
+          <div class="ex">¿Todavía toca la guitarra? — Does he play the guitar <strong>anymore</strong>?</div>
+        </div>
+
+        <div class="card" style="background:var(--accent-soft);border-left:3px solid var(--accent)">
+          <p style="margin:0;font-size:13.5px">Estos adverbios son importantes para expresar matices temporales y ayudan a comunicar con precisión cuándo ocurrieron o están ocurriendo acciones en relación con el tiempo.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="border-left:3px solid var(--warn);background:var(--warn-soft);padding:14px 16px">
+          <div style="background:var(--warn);color:#fff;display:inline-block;padding:3px 10px;font-size:10.5px;letter-spacing:1.5px;border-radius:3px;margin-bottom:8px">⚠ MUCHO CUIDADO CON…</div>
+          <p style="margin:0;font-size:13px">Para pronunciar <strong>yet</strong>, intenta decir el inicio de la palabra <em>hiena</em>. <code style="background:var(--paper);padding:1px 5px;border-radius:3px">/iet/</code>. Si usas la <em>y</em> estarás pronunciando un tipo de avión: <em>jet</em>.</p>
+        </div>
+
+        <div class="card" style="border-left:3px solid var(--accent);background:var(--accent-soft);padding:14px 16px">
+          <div style="background:var(--accent);color:#fff;display:inline-block;padding:3px 10px;font-size:10.5px;letter-spacing:1.5px;border-radius:3px;margin-bottom:8px">💡 DATO INTERESANTE</div>
+          <p style="margin:0;font-size:13px">En 1987 U2 lanzó al mercado <em>I Still Haven't Found What I'm Looking For</em> para que puedas tararear la canción y practicar con la palabra <strong>still</strong>. Gracias, Bono.</p>
+        </div>
+
+        <div class="card" style="border-left:3px solid var(--bad);background:var(--bad-soft);padding:14px 16px">
+          <div style="background:var(--bad);color:#fff;display:inline-block;padding:3px 10px;font-size:10.5px;letter-spacing:1.5px;border-radius:3px;margin-bottom:8px">⚡ NO TE EQUIVOQUES AQUÍ</div>
+          <p style="margin:0;font-size:13px"><strong>Still</strong> como adjetivo se traduce por <em>quieto</em>. Esto te va a ayudar a recordar cómo decir <strong>agua sin gas</strong> en inglés. <em>Still water</em>, vamos, agua quieta.</p>
+        </div>
+
+        <div class="card" style="border-left:3px solid var(--good);background:var(--good-soft);padding:14px 16px">
+          <div style="background:var(--good);color:#fff;display:inline-block;padding:3px 10px;font-size:10.5px;letter-spacing:1.5px;border-radius:3px;margin-bottom:8px">🧠 TRUCO RÁPIDO</div>
+          <p style="margin:0;font-size:13px"><strong>Yet</strong> y <strong>anymore</strong> = final de frase.<br><strong>Already</strong> y <strong>still</strong> = delante del verbo principal, detrás de <em>to be</em>.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="h-sub">Tabla de práctica — 16 ejemplos</h2>
+    <div class="ysa-table" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>${ysaColLeft}</div>
+      <div>${ysaColRight}</div>
+    </div>
+    <style>
+      @media (max-width: 800px) {
+        #gr-ysa .ysa-grid { grid-template-columns: 1fr !important; }
+        #gr-ysa .ysa-table { grid-template-columns: 1fr !important; }
+      }
+    </style>
+  `;
 }
 
 function answerUnitQuiz(btn, ui, qi, oi){
@@ -1340,6 +1425,59 @@ function renderSpeakingWriting(){
         <li>Repetir <em>"and… and… and…"</em> → usa <em>moreover, what's more, on top of that</em>.</li>
       </ul>
     </div>
+    <div class="card" style="border-left:4px solid #3f8baa">
+      <h3>🎙️ Signposting language — Mini-presentación</h3>
+      <p class="muted" style="margin-bottom:10px">Frases para estructurar una mini-presentación profesional (Aptis Part 4 o cualquier exposición tipo "Work-Life Balance: Strategies to maintain a healthy lifestyle while managing a career"). Organizadas por fase: abrir, estructurar, transicionar, enfatizar y cerrar.</p>
+
+      <h4 class="h-sub2">1. Abrir la presentación</h4>
+      <div class="ex">Today, I'm going to talk about…</div>
+      <div class="ex">Hello everyone, today I'd like to discuss…</div>
+      <div class="ex">Good morning / afternoon, I'm here to talk about…</div>
+      <div class="ex">What I'd like to talk to you about today is…</div>
+      <div class="ex">The aim of my presentation today is to…</div>
+
+      <h4 class="h-sub2">2. Estructurar / anunciar el orden</h4>
+      <div class="ex">First, I'll talk about… Then, I'll move on to… Finally, I'll discuss…</div>
+      <div class="ex">I'll begin by…, after that I'll…, and to conclude I'll…</div>
+      <div class="ex">There are three main points I want to cover today.</div>
+      <div class="ex">Let me start with…</div>
+      <div class="ex">I've divided my talk into three parts: …, … and …</div>
+
+      <h4 class="h-sub2">3. Transiciones entre puntos</h4>
+      <div class="ex">This brings me to my next point…</div>
+      <div class="ex">Moving on to…</div>
+      <div class="ex">Now let's turn to…</div>
+      <div class="ex">That said, let's look at…</div>
+      <div class="ex">Building on that, …</div>
+      <div class="ex">Having looked at X, let's now consider Y.</div>
+
+      <h4 class="h-sub2">4. Enfatizar / destacar</h4>
+      <div class="ex">It's important to highlight that…</div>
+      <div class="ex">What's worth noting is…</div>
+      <div class="ex">I'd like to stress / emphasise that…</div>
+      <div class="ex">Crucially, …</div>
+      <div class="ex">Above all, …</div>
+      <div class="ex">The key point here is that…</div>
+
+      <h4 class="h-sub2">5. Dar ejemplos</h4>
+      <div class="ex">For instance, …</div>
+      <div class="ex">A clear example of this is…</div>
+      <div class="ex">Take, for example, …</div>
+      <div class="ex">To illustrate this, …</div>
+
+      <h4 class="h-sub2">6. Cerrar / concluir</h4>
+      <div class="ex">In brief, …</div>
+      <div class="ex">To sum up, …</div>
+      <div class="ex">All in all, …</div>
+      <div class="ex">To wrap things up, …</div>
+      <div class="ex">In a nutshell, …</div>
+      <div class="ex">Thank you for your attention. Are there any questions?</div>
+
+      <div style="margin-top:14px;padding:10px 14px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;font-size:13px">
+        <strong>💡 Tema de práctica:</strong> <em>Work-Life Balance — Strategies to maintain a healthy lifestyle while managing a career.</em> Prepáralo en 1 minuto usando 4-5 frases de signposting de las cajas de arriba, y crónometra 2 minutos hablando.
+      </div>
+    </div>
+
     <div class="card">
       <h3>Generador de tema random</h3>
       <p>Sortea un tema, prepáralo en 1 min y crónometra 2 min.</p>
@@ -2272,13 +2410,58 @@ function renderPlan(){
   p.querySelector('#pl-focus').innerHTML = `<p class="muted">Protocolo Focus del programa APTIS C1/C2 — micro-sesiones, body doubling, dictado inverso.</p>${HTML_Focus_PROTOCOL || '<p>(El bloque original no se extrajo; revisa archivo aptis_grammar.html para detalles.)</p>'}`;
   // Plan APT (recovered: full plan page from aptis_complete.html — Manifesto + Microsesión + Semana tipo + Mapa 8 semanas + Si caes en bucle)
   p.querySelector('#pl-planapt').innerHTML = '<div class="apt-imp">' + HTML_APT_PLAN + '</div>';
-  // Temario (GRAMMAR_WEEKS summary)
-  let th = `<p class="muted">8 semanas — 5 sesiones de 25 min cada una. Lunes a viernes con un foco gramatical específico.</p>`;
-  APP_DATA.GRAMMAR_WEEKS.forEach(w => {
-    th += `<div class="gw-card">
-      <div class="gw-h"><div class="gw-num">${w.num}</div><div class="gw-meta"><h2>${esc(w.title)}</h2><span class="theme">${esc(w.theme)}</span></div></div>
-      ${w.days.map(d => `<div class="gw-day"><b>${esc(d.d)} — ${esc(d.t)}</b><br>${esc(d.ex)}</div>`).join('')}
-    </div>`;
+  // Temario (calendario L-V) — paleta rotativa por semana
+  const calColors = ['#1f4e8c','#2d6a4f','#a8541a','#9d2929','#7a5fa6','#3f8baa','#b85a8b','#7d5a3c'];
+  const calIcons = {'Lunes':'🌑','Martes':'🌒','Miércoles':'🌓','Jueves':'🌔','Viernes':'🌕'};
+  let th = `<p class="muted" style="margin-bottom:18px">8 semanas · 5 sesiones de 25 min · Lunes a Viernes. Cada día con su tema y un ejemplo clave. Click en "Ver detalle" para abrir el contenido completo de la sesión.</p>
+    <style>
+      .cal-week{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 14px 10px;margin-bottom:18px;overflow:hidden}
+      .cal-week-h{display:flex;align-items:center;gap:14px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+      .cal-week-num{width:48px;height:48px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:18px;flex-shrink:0}
+      .cal-week-meta h3{font-family:var(--serif);font-size:1.15rem;margin:0;color:var(--ink)}
+      .cal-week-meta .theme{font-size:12px;color:var(--mute);font-style:italic;margin-top:2px;display:block}
+      .cal-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+      .cal-day{background:var(--line-soft);border:1px solid var(--line);border-radius:6px;padding:10px;font-size:12px;display:flex;flex-direction:column;min-height:160px;transition:.15s}
+      .cal-day:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+      .cal-day-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+      .cal-day-name{font-weight:700;color:var(--ink);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
+      .cal-day-icon{font-size:14px;opacity:.7}
+      .cal-day-t{font-family:var(--serif);font-size:12.5px;font-weight:600;color:var(--accent);margin-bottom:6px;line-height:1.3}
+      .cal-day-ex{font-size:11.5px;color:var(--ink-soft);line-height:1.45;flex:1}
+      .cal-day-detail-btn{background:none;border:1px solid var(--line);color:var(--mute);font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;margin-top:6px;align-self:flex-start;transition:.15s}
+      .cal-day-detail-btn:hover{border-color:var(--accent);color:var(--accent)}
+      .cal-week-detail{display:none;margin-top:14px;padding:14px;background:var(--line-soft);border-radius:6px}
+      .cal-week-detail.on{display:block}
+      .cal-week-detail .week-content{background:transparent}
+      @media (max-width:900px){.cal-grid{grid-template-columns:repeat(2,1fr)}.cal-day{min-height:140px}}
+      @media (max-width:520px){.cal-grid{grid-template-columns:1fr}.cal-day{min-height:auto}}
+    </style>`;
+  APP_DATA.GRAMMAR_WEEKS.forEach((w, wi) => {
+    const color = calColors[wi % calColors.length];
+    const wIdx = wi; // for detail mapping to HTML_GRAMMAR_WEEKS
+    const dayCards = w.days.map(d => `
+      <div class="cal-day">
+        <div class="cal-day-h">
+          <span class="cal-day-name">${esc(d.d)}</span>
+          <span class="cal-day-icon">${calIcons[d.d]||'•'}</span>
+        </div>
+        <div class="cal-day-t">${esc(d.t)}</div>
+        <div class="cal-day-ex">${esc(d.ex)}</div>
+      </div>`).join('');
+    const hasDetail = (typeof HTML_GRAMMAR_WEEKS !== 'undefined' && HTML_GRAMMAR_WEEKS[wIdx]);
+    th += `
+      <div class="cal-week" data-week="${w.num}">
+        <div class="cal-week-h">
+          <div class="cal-week-num" style="background:${color}">${esc(w.num)}</div>
+          <div class="cal-week-meta">
+            <h3>${esc(w.title)}</h3>
+            <span class="theme">${esc(w.theme)}</span>
+          </div>
+          ${hasDetail ? `<button class="btn sec" style="margin-left:auto;padding:6px 14px;font-size:12px" onclick="toggleWeekDetail(${wIdx}, this)">Ver detalle ▾</button>` : ''}
+        </div>
+        <div class="cal-grid">${dayCards}</div>
+        ${hasDetail ? `<div class="cal-week-detail" id="cal-detail-${wIdx}"></div>` : ''}
+      </div>`;
   });
   p.querySelector('#pl-temario').innerHTML = th;
   // Activate units
@@ -2304,6 +2487,23 @@ function renderPlan(){
   p.querySelector('#pl-srs').innerHTML = renderSRS();
   attachSRSHandlers();
 }
+
+window.toggleWeekDetail = function(wi, btn){
+  const box = document.getElementById('cal-detail-' + wi);
+  if (!box) return;
+  const isOpen = box.classList.contains('on');
+  if (isOpen) {
+    box.classList.remove('on');
+    if (btn) btn.innerHTML = 'Ver detalle ▾';
+  } else {
+    if (!box.dataset.loaded) {
+      box.innerHTML = (typeof HTML_GRAMMAR_WEEKS !== 'undefined' && HTML_GRAMMAR_WEEKS[wi]) ? HTML_GRAMMAR_WEEKS[wi] : '<p class="muted">Detalle no disponible.</p>';
+      box.dataset.loaded = '1';
+    }
+    box.classList.add('on');
+    if (btn) btn.innerHTML = 'Ocultar ▴';
+  }
+};
 
 function renderFlashWidget(deck, prefix){
   // Categories from deck.cat distinct
