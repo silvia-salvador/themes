@@ -416,8 +416,6 @@ hr.div{border:none;border-top:1px dotted var(--line);margin:14px 0}
       <button class="np on" data-pg="home">Inicio</button>
       <button class="np" data-pg="grammar">Gramática</button>
       <button class="np" data-pg="vocab">Vocabulario</button>
-      <button class="np" data-pg="phrasal">Phrasal &amp; Preps</button>
-      <button class="np" data-pg="idioms">Idioms &amp; Conectores</button>
       <button class="np" data-pg="speaking">Speaking &amp; Writing</button>
       <button class="np" data-pg="tests">Tests APTIS</button>
       <button class="np" data-pg="plan">Plan de estudio</button>
@@ -432,8 +430,6 @@ hr.div{border:none;border-top:1px dotted var(--line);margin:14px 0}
 <div id="page-home" class="page on"></div>
 <div id="page-grammar" class="page"></div>
 <div id="page-vocab" class="page"></div>
-<div id="page-phrasal" class="page"></div>
-<div id="page-idioms" class="page"></div>
 <div id="page-speaking" class="page"></div>
 <div id="page-tests" class="page"></div>
 <div id="page-plan" class="page"></div>
@@ -511,10 +507,27 @@ const STATE = {
 };
 document.documentElement.setAttribute('data-theme', STATE.theme);
 
-function go(page){
+function go(page, subtab, subtab2){
   document.querySelectorAll('.np').forEach(b => b.classList.toggle('on', b.dataset.pg === page));
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('on', p.id === 'page-'+page));
   window.scrollTo({top:0,behavior:'smooth'});
+  if (subtab) {
+    setTimeout(() => {
+      const pageEl = document.getElementById('page-'+page);
+      if (!pageEl) return;
+      const btn = pageEl.querySelector(`[data-t="${subtab}"]`) || pageEl.querySelector(`[data-tab="${subtab}"]`);
+      if (btn) btn.click();
+      // Second-level subtab (e.g. Vocab → Phrasal &amp; Preps → "Phrasals de 3 partes")
+      if (subtab2) {
+        setTimeout(() => {
+          const innerPanel = pageEl.querySelector(`#vc-${subtab}`) || pageEl.querySelector(`#gr-${subtab}`) || pageEl.querySelector(`#sw-${subtab}`) || pageEl.querySelector(`#pl-${subtab}`);
+          if (!innerPanel) return;
+          const innerBtn = innerPanel.querySelector(`[data-t="${subtab2}"]`) || innerPanel.querySelector(`[data-tab="${subtab2}"]`);
+          if (innerBtn) innerBtn.click();
+        }, 80);
+      }
+    }, 30);
+  }
 }
 document.querySelectorAll('.np').forEach(b => b.onclick = () => go(b.dataset.pg));
 document.getElementById('theme-btn').onclick = () => {
@@ -592,8 +605,8 @@ function renderHome(){
   let testTotal = (T.p1?T.p1.length:0) + (T.p2_hub?T.p2_hub.length:0) + (T.p3_hub?T.p3_hub.length:0) + (T.p4_hub?T.p4_hub.length:0)
     + (T.quizBasic?T.quizBasic.length:0) + (T.quizAdvanced?T.quizAdvanced.length:0) + (T.quizColloc?T.quizColloc.length:0)
     + (T.synQ?T.synQ.length:0) + (T.defQ?T.defQ.length:0) + (T.ctxQ?T.ctxQ.length:0)
-    + (T.apt && T.apt['1'] ? T.apt['1'].grammar.length + T.apt['1'].vocab.length + (T.apt['1'].fillBlank||[]).length : 0)
-    + Object.values(T.extra||{}).reduce((acc,v) => acc + (v.grammar?v.grammar.length:0) + (v.vocab?v.vocab.length:0),0);
+    + Object.values(T.apt||{}).reduce((acc,v) => acc + aptCount(v), 0)
+    + Object.values(T.extra||{}).reduce((acc,v) => acc + aptCount(v), 0);
   const tipIdx = (new Date()).getDate() % APP_DATA.DAILY_TIPS.length;
   const tip = APP_DATA.DAILY_TIPS[tipIdx];
 
@@ -616,12 +629,13 @@ function renderHome(){
     <h2 class="h-sub">Por dónde empiezo</h2>
     <div class="qstart">
       <button class="qs" data-pg="grammar"><div class="qs-t">Gramática</div><div class="qs-d">Inversión · cleft · condicionales · modales · subjuntivo · discourse</div></button>
-      <button class="qs" data-pg="vocab"><div class="qs-t">Vocabulario</div><div class="qs-d">${APP_DATA.VOCAB_CATS.length} categorías · mapas conceptuales · word families</div></button>
-      <button class="qs" data-pg="phrasal"><div class="qs-t">Phrasal &amp; Preps</div><div class="qs-d">Por partícula · 3-part · uses · adj/verb + prep</div></button>
-      <button class="qs" data-pg="idioms"><div class="qs-t">Idioms &amp; Conectores</div><div class="qs-d">${APP_DATA.IDIOM_TOPICS.length} temas + sinónimos avanzados + connectors</div></button>
+      <button class="qs" data-pg="vocab"><div class="qs-t">Vocabulario</div><div class="qs-d">${APP_DATA.VOCAB_CATS.length} categorías · mapas conceptuales · collocations · flashcards</div></button>
+      <button class="qs" data-pg="vocab" data-sub="syn"><div class="qs-t">Sinónimos</div><div class="qs-d">${APP_DATA.SYNONYMS.length}+ grupos de sinónimos C1/C2 con búsqueda</div></button>
+      <button class="qs" data-pg="vocab" data-sub="phrasal"><div class="qs-t">Phrasal &amp; Preps</div><div class="qs-d">Verb Map · por partícula · 3-part · adj/verb + prep</div></button>
+      <button class="qs" data-pg="vocab" data-sub="idioms"><div class="qs-t">Idioms</div><div class="qs-d">${APP_DATA.IDIOM_TOPICS.length} temas de idioms con ejemplos personales</div></button>
       <button class="qs" data-pg="speaking"><div class="qs-t">Speaking &amp; Writing</div><div class="qs-d">Estructuras · temas Aptis · reported speech · essay</div></button>
       <button class="qs" data-pg="tests"><div class="qs-t">Tests APTIS</div><div class="qs-d">4 partes + tests adicionales</div></button>
-      <button class="qs" data-pg="plan"><div class="qs-t">Plan de estudio</div><div class="qs-d">Plan Focus · temario · flashcards · SRS</div></button>
+      <button class="qs" data-pg="plan"><div class="qs-t">Plan de estudio</div><div class="qs-d">Plan Focus · temario calendario · SRS</div></button>
     </div>
     <h2 class="h-sub">Consejo del día</h2>
     <div class="card">
@@ -668,7 +682,7 @@ function renderHome(){
       </div>
     </div>
   `;
-  p.querySelectorAll('.qs').forEach(b => b.onclick = () => go(b.dataset.pg));
+  p.querySelectorAll('.qs').forEach(b => b.onclick = () => go(b.dataset.pg, b.dataset.sub));
 }
 
 /* ===================== GRAMMAR ===================== */
@@ -983,19 +997,23 @@ function renderVocab(){
   p.innerHTML = `
     <div class="h-sec">
       <h1>Vocabulario — C1 / C2</h1>
-      <p>${APP_DATA.VOCAB_CATS.length} categorías fusionadas de Activate C1, Reference y Advanced Vocab Trainer. Verb Map (10 partículas) y Mapas Lingüísticos (7 bloques) como sub-bloques visuales.</p>
+      <p>Hub completo: listas temáticas, sinónimos, phrasal verbs &amp; preposiciones, idioms, collocations, mapas conceptuales y flashcards. Todo el léxico en un solo sitio.</p>
     </div>
     <div class="subtabs" id="vc-tabs">
       <button class="stb on" data-t="lists">Listas temáticas</button>
+      <button class="stb" data-t="syn">Sinónimos</button>
+      <button class="stb" data-t="phrasal">Phrasal &amp; Preps</button>
+      <button class="stb" data-t="idioms">Idioms</button>
       <button class="stb" data-t="coll">Collocations</button>
       <button class="stb" data-t="maps">Mapas conceptuales</button>
-      <button class="stb" data-t="verbmap">Verb Map</button>
       <button class="stb" data-t="flash">Flashcards C1/C2</button>
     </div>
     <div class="panel on" id="vc-lists"></div>
+    <div class="panel" id="vc-syn"></div>
+    <div class="panel" id="vc-phrasal"></div>
+    <div class="panel" id="vc-idioms"></div>
     <div class="panel" id="vc-coll"></div>
     <div class="panel" id="vc-maps"></div>
-    <div class="panel" id="vc-verbmap"></div>
     <div class="panel" id="vc-flash"></div>
   `;
   p.querySelectorAll('#vc-tabs .stb').forEach(b => b.onclick = () => {
@@ -1003,35 +1021,67 @@ function renderVocab(){
     b.classList.add('on');
     p.querySelectorAll('.panel').forEach(x => x.classList.toggle('on', x.id === 'vc-'+b.dataset.t));
   });
-  // Lists
+  // Lists — separadas en 3 sub-secciones por origen del icono inicial
   const lists = p.querySelector('#vc-lists');
-  let html = `<div class="filter-row" id="voc-filter"><button class="fch on" data-cat="__all">Todas</button>`;
-  APP_DATA.VOCAB_CATS.forEach((c,i) => { html += `<button class="fch" data-cat="${i}">${esc(c.name)} <span class="small">(${c.items.length})</span></button>`; });
-  html += `</div>`;
-  APP_DATA.VOCAB_CATS.forEach((cat, ci) => {
-    html += `<div class="col-grp" data-cat="${ci}">
-      <div class="col-grp-h">${esc(cat.name)} <span class="small">— ${cat.items.length}${cat.sub?' · '+esc(cat.sub):''}</span></div>
-      <div class="col-list">
-        ${cat.items.map(it => `
-          <div class="col-it">
-            <span class="col-w">${esc(it.en)}</span>${it.pos?` <span class="small">(${it.pos})</span>`:''}
-            ${it.phon?` <span class="small" style="font-style:italic">${esc(it.phon)}</span>`:''}
-            ${it.es?` <span class="col-d">— ${esc(it.es)}</span>`:''}
-            ${it.def?`<span class="col-tr">${esc(it.def)}</span>`:''}
-            ${it.ex?`<span class="col-ex">${esc(it.ex)}</span>`:''}
-            ${it.tr?`<span class="col-tr">${esc(it.tr)}</span>`:''}
-            ${it.family?`<span class="col-fam">family: ${it.family.join(' · ')}</span>`:''}
-          </div>
-        `).join('')}
-      </div>
-    </div>`;
+  const groupOf = (cat) => {
+    const n = cat.name || '';
+    if (n.startsWith('🚀')) return 'adv';
+    if (n.startsWith('🗂️')) return 'act';
+    return 'sem';
+  };
+  const sections = [
+    {id:'act', label:'📘 Activate C1', desc:'Categorías directas del libro Activate C1 (temas individuales: Age, Money & Finance, Legal matters…)'},
+    {id:'sem', label:'🧩 Bloques semánticos', desc:'Categorías fusionadas por campo semántico (Comunicación, Personas, Dinero, Hogar, Cuerpo…)'},
+    {id:'adv', label:'🚀 Advanced (C2)', desc:'Vocabulario avanzado C2 para temas de debate, ética, política, ciencia y comportamiento.'}
+  ];
+  let html = '';
+  sections.forEach(sec => {
+    const catsInSec = APP_DATA.VOCAB_CATS.map((c,i)=>({c,i})).filter(o => groupOf(o.c) === sec.id);
+    if (!catsInSec.length) return;
+    const totalItems = catsInSec.reduce((s,o)=>s+o.c.items.length,0);
+    html += `<div class="vc-sec" data-sec="${sec.id}">
+      <h2 class="h-sub" style="display:flex;align-items:center;gap:10px;margin-top:24px">
+        <span>${esc(sec.label)}</span>
+        <span class="small" style="font-weight:400">${catsInSec.length} categorías · ${totalItems} items</span>
+      </h2>
+      <p class="muted" style="margin-bottom:10px;font-size:13px">${esc(sec.desc)}</p>
+      <div class="filter-row vc-sec-filter" data-sec="${sec.id}">
+        <button class="fch on" data-cat="__all">Todas (${sec.id})</button>
+        ${catsInSec.map(o => `<button class="fch" data-cat="${o.i}">${esc(o.c.name.replace(/^[^\\s]+\\s+/,'').trim())} <span class="small">(${o.c.items.length})</span></button>`).join('')}
+      </div>`;
+    catsInSec.forEach(o => {
+      const cat = o.c, ci = o.i;
+      html += `<div class="col-grp" data-cat="${ci}" data-sec="${sec.id}">
+        <div class="col-grp-h">${esc(cat.name)} <span class="small">— ${cat.items.length}${cat.sub?' · '+esc(cat.sub):''}</span></div>
+        <div class="col-list">
+          ${cat.items.map(it => `
+            <div class="col-it">
+              <span class="col-w">${esc(it.en)}</span>${it.pos?` <span class="small">(${it.pos})</span>`:''}
+              ${it.phon?` <span class="small" style="font-style:italic">${esc(it.phon)}</span>`:''}
+              ${it.es?` <span class="col-d">— ${esc(it.es)}</span>`:''}
+              ${it.def?`<span class="col-tr">${esc(it.def)}</span>`:''}
+              ${it.ex?`<span class="col-ex">${esc(it.ex)}</span>`:''}
+              ${it.tr?`<span class="col-tr">${esc(it.tr)}</span>`:''}
+              ${it.family?`<span class="col-fam">family: ${it.family.join(' · ')}</span>`:''}
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
   });
   lists.innerHTML = html;
-  lists.querySelectorAll('#voc-filter .fch').forEach(b => b.onclick = () => {
-    lists.querySelectorAll('#voc-filter .fch').forEach(x => x.classList.remove('on'));
-    b.classList.add('on');
-    const cat = b.dataset.cat;
-    lists.querySelectorAll('.col-grp').forEach(g => g.style.display = (cat==='__all' || g.dataset.cat===cat) ? 'block' : 'none');
+  // Filtro local por sub-sección — solo afecta a sus propias .col-grp
+  lists.querySelectorAll('.vc-sec-filter').forEach(filterRow => {
+    const secId = filterRow.dataset.sec;
+    filterRow.querySelectorAll('.fch').forEach(b => b.onclick = () => {
+      filterRow.querySelectorAll('.fch').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      const cat = b.dataset.cat;
+      lists.querySelectorAll(`.col-grp[data-sec="${secId}"]`).forEach(g => {
+        g.style.display = (cat === '__all' || g.dataset.cat === cat) ? 'block' : 'none';
+      });
+    });
   });
 
     // Collocations (unified: hub COLLOCATIONS by abstract category + apt TOPICS.collocations by aptis topic)
@@ -1066,28 +1116,15 @@ function renderVocab(){
   });
   maps.innerHTML = mh;
 
-  // Verb Map (apt.PV_DATA reused: we still have it in PV_BY_PARTICLE but with merged data)
-  const vm = p.querySelector('#vc-verbmap');
-  let vh = `<p class="muted">Verb Map — 10 partículas + significado simbólico. Click en cada phrasal para ver tip mnemónico (cuando exista).</p>
-  <details style="margin:14px 0;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px"><summary style="cursor:pointer;font-weight:600;color:var(--accent)">📊 Mapa visual de los 12 tiempos verbales (timeline)</summary><div class="apt-imp">${HTML_APT_VERBMAP.replace(/<div\s+id="verbmap"[^>]*>/,'<div>').replace(/<div\s+class="sh">[\s\S]*?<\/div>/,'')}</div></details>`;
-  const PARTICLES_ORDER = ['up','out','off','down','into','away','on','over','back','through','in','misc'];
-  PARTICLES_ORDER.forEach(part => {
-    const arr = APP_DATA.PV_BY_PARTICLE[part]; if (!arr) return;
-    vh += `<div class="pv-grp"><div class="pv-grp-h">${part.toUpperCase()} <span class="pv-meta">${arr.length} verbs</span></div>
-      <div class="pv-list">${arr.map(pv => `
-        <div class="pv" onclick="this.classList.toggle('open')">
-          <div class="pv-w">${esc(pv.w)}</div>
-          <div class="pv-m">${pv.meanings.map(esc).join(' · ')}</div>
-          ${pv.examples.length? `<div class="pv-x">${pv.examples.map(e => `<div>${e}</div>`).join('')}</div>` : ''}
-          ${pv.tips.length? `<div class="pv-tip">${pv.tips.map(esc).join('<br>')}</div>` : ''}
-        </div>`).join('')}</div></div>`;
-  });
-  vm.innerHTML = vh;
-
   // Flash (cards from APP_DATA.FLASHCARDS) — Vocab-only sub-deck
   const fl = p.querySelector('#vc-flash');
   fl.innerHTML = renderFlashWidget(APP_DATA.FLASHCARDS, 'vc-fl');
   attachFlashWidget('vc-fl', APP_DATA.FLASHCARDS);
+
+  // Subtabs fusionados: Sinónimos, Phrasal &amp; Preps, Idioms
+  renderSynonyms('vc-syn');
+  renderPhrasal('vc-phrasal');
+  renderIdioms('vc-idioms');
 }
 
 function renderMapTopic(tp){
@@ -1107,29 +1144,30 @@ function renderMapTopic(tp){
 }
 
 /* ===================== PHRASAL & PREPS ===================== */
-function renderPhrasal(){
-  const p = document.getElementById('page-phrasal');
+function renderPhrasal(targetId){
+  const p = document.getElementById(targetId || 'page-phrasal');
+  if (!p) return;
   p.innerHTML = `
     <div class="h-sec">
       <h1>Phrasal Verbs &amp; Preposiciones</h1>
-      <p>Phrasal verbs por partícula, 3-part phrasals, adj/noun con partícula, prep phrases y uses (at/in/on…), colocaciones adj+prep y verb+prep.</p>
+      <p>Phrasal verbs por partícula, phrasals de 3 partes, adjetivos compuestos y sustantivos derivados. Reglas de uso de las preposiciones (at/in/on/by…), frases hechas y colocaciones (adjetivo/verbo + preposición).</p>
     </div>
     <div class="subtabs" id="pp-tabs">
-      <button class="stb on" data-t="pv">Por partícula</button>
-      <button class="stb" data-t="3p">3-part</button>
-      <button class="stb" data-t="adjp">Adj + partícula</button>
-      <button class="stb" data-t="npv">Nouns de PV</button>
-      <button class="stb" data-t="ppf">Prep phrases</button>
-      <button class="stb" data-t="puses">Prep uses</button>
-      <button class="stb" data-t="adjpr">Adj + prep</button>
-      <button class="stb" data-t="vbpr">Verb + prep</button>
+      <button class="stb on" data-t="pv">Phrasals (por partícula)</button>
+      <button class="stb" data-t="3p">Phrasals de 3 partes</button>
+      <button class="stb" data-t="adjp">Adjetivos compuestos</button>
+      <button class="stb" data-t="npv">Sustantivos derivados</button>
+      <button class="stb" data-t="puses">Reglas: AT / IN / ON / BY…</button>
+      <button class="stb" data-t="ppf">Frases hechas con preposición</button>
+      <button class="stb" data-t="adjpr">Adjetivo + preposición</button>
+      <button class="stb" data-t="vbpr">Verbo + preposición</button>
     </div>
     <div class="panel on" id="pp-pv"></div>
     <div class="panel" id="pp-3p"></div>
     <div class="panel" id="pp-adjp"></div>
     <div class="panel" id="pp-npv"></div>
-    <div class="panel" id="pp-ppf"></div>
     <div class="panel" id="pp-puses"></div>
+    <div class="panel" id="pp-ppf"></div>
     <div class="panel" id="pp-adjpr"></div>
     <div class="panel" id="pp-vbpr"></div>
   `;
@@ -1142,7 +1180,9 @@ function renderPhrasal(){
   // PV by particle (same render as in verbmap, but with filter)
   const pv = p.querySelector('#pp-pv');
   const PARTS = Object.keys(APP_DATA.PV_BY_PARTICLE);
-  let html = `<div class="filter-row" id="pv-filter">${PARTS.map((pa,i) => `<button class="fch ${i===0?'on':''}" data-pa="${pa}">${pa}</button>`).join('')}</div>`;
+  const pvTotal = Object.values(APP_DATA.PV_BY_PARTICLE).reduce((s,a)=>s+a.length,0);
+  let html = `<p class="muted">${pvTotal} phrasal verbs agrupados por su partícula (up, out, off, on…). Cada partícula tiene un "significado simbólico" recurrente. Click en cada verbo para ver ejemplos y tip mnemónico (cuando exista).</p>
+  <div class="filter-row" id="pv-filter">${PARTS.map((pa,i) => `<button class="fch ${i===0?'on':''}" data-pa="${pa}">${pa}</button>`).join('')}</div>`;
   PARTS.forEach((pa,i) => {
     const arr = APP_DATA.PV_BY_PARTICLE[pa];
     html += `<div class="pv-grp" data-pa="${pa}" style="display:${i===0?'block':'none'}"><div class="pv-grp-h">${pa.toUpperCase()} <span class="pv-meta">${arr.length} verbs</span></div>
@@ -1161,37 +1201,42 @@ function renderPhrasal(){
     pv.querySelectorAll('.pv-grp[data-pa]').forEach(g => g.style.display = g.dataset.pa === b.dataset.pa ? 'block' : 'none');
   });
 
-  // 3-part
-  p.querySelector('#pp-3p').innerHTML = renderPVFlat(APP_DATA.PV_3PART, 'Three-part phrasal verbs');
-  // adj + particle
-  p.querySelector('#pp-adjp').innerHTML = renderPVFlat(APP_DATA.ADJ_PARTICLES, 'Adjetivos con partícula');
-  // nouns from PV
-  p.querySelector('#pp-npv').innerHTML = renderPVFlat(APP_DATA.NOUNS_FROM_PV, 'Nombres derivados de phrasal verbs');
+  // 3-part phrasals (verb + particle + preposition)
+  p.querySelector('#pp-3p').innerHTML = `<p class="muted">Phrasals de tres partes: <em>verbo + partícula + preposición</em>. Funcionan como bloque inseparable. Ejemplos típicos: <em>come up with, look forward to, get away with, catch up with</em>. Click en cada uno para ver el ejemplo de uso.</p>` + renderPVFlat(APP_DATA.PV_3PART, 'Phrasal verbs de 3 partes');
+  // adj + particle (compound adjectives)
+  p.querySelector('#pp-adjp').innerHTML = `<p class="muted">Adjetivos formados por <em>adjetivo/participio + partícula</em>: <em>built-up, cheesed off, well-off, worn-out</em>. Muchos son coloquiales o idiomáticos. Memorízalos como bloque.</p>` + renderPVFlat(APP_DATA.ADJ_PARTICLES, 'Adjetivos compuestos con partícula');
+  // nouns derived from phrasal verbs
+  p.querySelector('#pp-npv').innerHTML = `<p class="muted">Sustantivos derivados de phrasal verbs — el verbo se nominaliza en una sola palabra: <em>breakdown, breakthrough, checkout, takeoff, outcome</em>. Esenciales para writing C1/C2.</p>` + renderPVFlat(APP_DATA.NOUNS_FROM_PV, 'Sustantivos derivados de phrasals');
 
-  // PP phrases
+  // Prep phrases (fixed expressions: at ease, by chance…)
   const ppf = p.querySelector('#pp-ppf');
-  let pphtml = '';
+  const ppfTotal = Object.values(APP_DATA.PREP_PHRASES).reduce((s,a)=>s+a.length,0);
+  let pphtml = `<p class="muted">${ppfTotal} expresiones fijas que empiezan por una preposición. Son bloques cerrados — no traduces palabra a palabra: <em>at ease, by chance, in fact, on purpose, out of the blue…</em></p>`;
   Object.entries(APP_DATA.PREP_PHRASES).forEach(([k, arr]) => {
-    pphtml += `<div class="prep-card"><div class="prep-h">${k} <span class="small">— ${arr.length} phrases</span></div>
+    pphtml += `<div class="prep-card"><div class="prep-h">${k} <span class="small">— ${arr.length} expresiones</span></div>
       <div class="prep-list">${arr.map(i => `
         <div class="prep-it"><span class="pi-p">${esc(i.p)}</span><span class="pi-m">${esc(i.m||'')}</span>${i.ex?`<span class="pi-ex">${esc(i.ex)}</span>`:''}</div>
       `).join('')}</div></div>`;
   });
   ppf.innerHTML = pphtml;
 
-  // Prep uses (apt.prepData)
+  // Prep uses — reglas y patrones de las preposiciones principales
   const pu = p.querySelector('#pp-puses');
-  pu.innerHTML = (APP_DATA.PREP_USES||[]).map(pr => `
+  const puTotal = (APP_DATA.PREP_USES||[]).length;
+  pu.innerHTML = `<p class="muted">Reglas de uso de las ${puTotal} preposiciones más confusas (AT, IN, ON, BY…) con sus patrones principales: <em>punto vs espacio cerrado, tiempo específico vs período, contacto vs medio</em>. Cada preposición con sus 2-4 usos clave y ejemplos.</p>` + (APP_DATA.PREP_USES||[]).map(pr => `
     <div class="prep-card"><div class="prep-h">${esc(pr.word)} <span class="small" style="font-style:italic">— ${esc(pr.tagline||'')}</span></div>
       ${pr.uses.map(u => `<div class="subsec"><h4>${esc(u.label)}</h4><p>${esc(u.rule)}</p>${(u.examples||[]).map(e => `<div class="ex">${e}</div>`).join('')}</div>`).join('')}
     </div>
   `).join('');
 
-  // Adj + prep
-  p.querySelector('#pp-adjpr').innerHTML = `<div class="prep-card"><div class="prep-h">Adjective + preposition</div>
-    <p class="small" style="margin-bottom:8px">Memorízalos como bloque, no traduzcas pieza a pieza.</p>
+  // Adj + prep — colocaciones obligatorias
+  p.querySelector('#pp-adjpr').innerHTML = `<p class="muted">Adjetivos que <strong>exigen</strong> una preposición concreta. La preposición no es lógica, es convencional — memorízala con el adjetivo: <em>good <strong>at</strong>, afraid <strong>of</strong>, interested <strong>in</strong>, married <strong>to</strong></em>.</p>
+    <div class="prep-card"><div class="prep-h">Adjective + preposition <span class="small">— ${APP_DATA.ADJ_PREP.length} colocaciones</span></div>
     <div class="prep-list">${APP_DATA.ADJ_PREP.map(i => `<div class="prep-it"><span class="pi-p">${esc(i.p)}</span><span class="pi-ex">${esc(i.ex||'')}</span></div>`).join('')}</div></div>`;
-  p.querySelector('#pp-vbpr').innerHTML = `<div class="prep-card"><div class="prep-h">Verb + preposition</div>
+
+  // Verb + prep — colocaciones obligatorias
+  p.querySelector('#pp-vbpr').innerHTML = `<p class="muted">Verbos que <strong>exigen</strong> una preposición concreta (sin cambiar el significado del verbo, a diferencia de un phrasal). Memoriza el bloque: <em>depend <strong>on</strong>, belong <strong>to</strong>, consist <strong>of</strong>, apologise <strong>for</strong></em>.</p>
+    <div class="prep-card"><div class="prep-h">Verb + preposition <span class="small">— ${APP_DATA.VERB_PREP.length} colocaciones</span></div>
     <div class="prep-list">${APP_DATA.VERB_PREP.map(i => `<div class="prep-it"><span class="pi-p">${esc(i.p)}</span><span class="pi-ex">${esc(i.ex||'')}</span></div>`).join('')}</div></div>`;
 }
 
@@ -1206,34 +1251,26 @@ function renderPVFlat(arr, title){
 }
 
 /* ===================== IDIOMS & CONNECTORS ===================== */
-function renderIdioms(){
-  const p = document.getElementById('page-idioms');
+function renderIdioms(targetId){
+  const p = document.getElementById(targetId || 'page-idioms');
+  if (!p) return;
+  const totalIdioms = APP_DATA.IDIOM_TOPICS.reduce((s,t)=>s+t.idioms.length,0);
   p.innerHTML = `
     <div class="h-sec">
-      <h1>Idioms · Conectores · Sinónimos avanzados · Colocaciones</h1>
-      <p>${APP_DATA.IDIOM_TOPICS.length} temas de idioms con ejemplo genérico y personal. Connectors por función. Sinónimos avanzados C1/C2. Colocaciones por campo semántico.</p>
+      <h1>Idioms</h1>
+      <p>${APP_DATA.IDIOM_TOPICS.length} temas · ${totalIdioms} idioms con ejemplo genérico y, cuando aplica, ejemplo personal. Filtra por tema o úsalo todo de un vistazo.</p>
     </div>
-    <div class="subtabs" id="id-tabs">
-      <button class="stb on" data-t="idioms">Idioms</button>
-      <button class="stb" data-t="syn">Sinónimos C1/C2</button>
-      <button class="stb" data-t="conn">Connectors</button>
-      <button class="stb" data-t="colloc">Collocations</button>
+    <div class="filter-row" id="id-filter">
+      <button class="fch on" data-topic="__all">Todos (${totalIdioms})</button>
+      ${APP_DATA.IDIOM_TOPICS.map(t => `<button class="fch" data-topic="${esc(t.id||t.title)}">${t.emoji||''} ${esc(t.title)} <span class="small">(${t.idioms.length})</span></button>`).join('')}
     </div>
-    <div class="panel on" id="id-idioms"></div>
-    <div class="panel" id="id-syn"></div>
-    <div class="panel" id="id-conn"></div>
-    <div class="panel" id="id-colloc"></div>
+    <div id="id-content"></div>
   `;
-  p.querySelectorAll('#id-tabs .stb').forEach(b => b.onclick = () => {
-    p.querySelectorAll('#id-tabs .stb').forEach(x => x.classList.remove('on'));
-    b.classList.add('on');
-    p.querySelectorAll('.panel').forEach(x => x.classList.toggle('on', x.id === 'id-'+b.dataset.t));
-  });
-  // IDIOMS
-  const ido = p.querySelector('#id-idioms');
+  const content = p.querySelector('#id-content');
   let html = '';
   APP_DATA.IDIOM_TOPICS.forEach(t => {
-    html += `<h2 class="h-sub">${t.emoji||''} ${esc(t.title)}</h2>`;
+    html += `<div class="id-topic" data-topic="${esc(t.id||t.title)}">
+      <h2 class="h-sub">${t.emoji||''} ${esc(t.title)} <span class="small" style="font-weight:400">— ${t.idioms.length}</span></h2>`;
     t.idioms.forEach(i => {
       html += `<div class="idiom-card"><div class="idiom-h">${esc(i.phrase)} <span class="idiom-es">— ${esc(i.es||'')}</span></div>
         <div class="idiom-m">${esc(i.meaning)}</div>
@@ -1242,59 +1279,112 @@ function renderIdioms(){
         ${i.note?`<div class="note">${esc(i.note)}</div>`:''}
       </div>`;
     });
+    html += `</div>`;
   });
-  ido.innerHTML = html;
+  content.innerHTML = html;
+  // Filter by topic
+  p.querySelectorAll('#id-filter .fch').forEach(b => b.onclick = () => {
+    p.querySelectorAll('#id-filter .fch').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    const topic = b.dataset.topic;
+    content.querySelectorAll('.id-topic').forEach(g => g.style.display = (topic === '__all' || g.dataset.topic === topic) ? 'block' : 'none');
+  });
+}
 
-  // SYNONYMS
-  const syn = p.querySelector('#id-syn');
-  let sh = `<p class="muted">Sinónimos avanzados — click en cada chip para ver ejemplo.</p>`;
-  APP_DATA.SYNONYMS.forEach(g => {
-    sh += `<div class="syn-grp"><div class="syn-w">${esc(g.word)}</div>
+function renderSynonyms(targetId){
+  const p = document.getElementById(targetId || 'page-syn');
+  if (!p) return;
+  const totalMain = APP_DATA.SYNONYMS.length;
+  const totalCompact = APP_DATA.SYN_GROUPS_COMPACT.length;
+  const totalAdj = (APP_DATA.ADJ_GROUPS||[]).length;
+  const totalNoun = (APP_DATA.NOUN_GROUPS||[]).length;
+  const totalWords = totalMain + totalCompact + totalAdj + totalNoun;
+  p.innerHTML = `
+    <div class="h-sec">
+      <h1>Sinónimos C1 / C2</h1>
+      <p>${totalWords} grupos de sinónimos para subir tu vocabulario de B2 a C1/C2. Busca por palabra base o filtra por tipo (verbos comunes, grupos compactos, adjetivos, sustantivos).</p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;align-items:center">
+      <input id="syn-q" type="text" placeholder="🔎 Buscar palabra (ej. happy, big, important)…" style="flex:1;min-width:240px;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font-size:13.5px;font-family:inherit">
+      <span class="small" id="syn-count" style="color:var(--mute)">${totalWords} grupos</span>
+    </div>
+    <div class="filter-row" id="syn-tabs">
+      <button class="fch on" data-syn="all">Todos (${totalWords})</button>
+      <button class="fch" data-syn="main">Verbos &amp; comunes <span class="small">(${totalMain})</span></button>
+      <button class="fch" data-syn="compact">Grupos compactos <span class="small">(${totalCompact})</span></button>
+      ${totalAdj?`<button class="fch" data-syn="adj">Adjetivos <span class="small">(${totalAdj})</span></button>`:''}
+      ${totalNoun?`<button class="fch" data-syn="noun">Sustantivos <span class="small">(${totalNoun})</span></button>`:''}
+    </div>
+    <div id="syn-main" class="syn-section"></div>
+    <div id="syn-compact" class="syn-section">
+      <h2 class="h-sub">Grupos compactos</h2>
+    </div>
+    ${totalAdj?'<div id="syn-adj" class="syn-section"><h2 class="h-sub">Adjective groups</h2></div>':''}
+    ${totalNoun?'<div id="syn-noun" class="syn-section"><h2 class="h-sub">Noun groups</h2></div>':''}
+  `;
+  // Build content
+  const m = p.querySelector('#syn-main');
+  m.innerHTML = `<p class="muted">Click en cada chip para revelar el ejemplo de uso.</p>` + APP_DATA.SYNONYMS.map(g => `
+    <div class="syn-grp" data-word="${esc((g.word||'').toLowerCase())}">
+      <div class="syn-w">${esc(g.word)}</div>
       <div class="syn-grid">${g.synonyms.map(s => `
         <div class="syn-chip" onclick="this.classList.toggle('open')">
           <span class="sw">${esc(s.w)}</span>
           ${s.es?`<span class="se">${esc(s.es)}</span>`:''}
           ${s.ex?`<div class="sex">${s.ex}</div>`:''}
-        </div>`).join('')}</div></div>`;
-  });
-  // Compact word groups (synonymGroups)
-  sh += `<h2 class="h-sub">Grupos compactos</h2>`;
-  APP_DATA.SYN_GROUPS_COMPACT.forEach(g => {
-    sh += `<div class="syn-grp"><div class="syn-w">${esc(g.word)}</div>
-      <div class="syn-grid">${g.syns.map(s => `<div class="syn-chip"><span class="sw">${esc(s)}</span></div>`).join('')}</div></div>`;
-  });
-  if (APP_DATA.ADJ_GROUPS.length) {
-    sh += `<h2 class="h-sub">Adjective groups</h2>`;
-    APP_DATA.ADJ_GROUPS.forEach(g => {
-      sh += `<div class="syn-grp"><div class="syn-w">${esc(g.word)}</div>
-        <div class="syn-grid">${(g.syns||[]).map(s => `<div class="syn-chip"><span class="sw">${esc(s)}</span></div>`).join('')}</div></div>`;
-    });
-  }
-  if (APP_DATA.NOUN_GROUPS.length) {
-    sh += `<h2 class="h-sub">Noun groups</h2>`;
-    APP_DATA.NOUN_GROUPS.forEach(g => {
-      sh += `<div class="syn-grp"><div class="syn-w">${esc(g.word)}</div>
-        <div class="syn-grid">${(g.syns||[]).map(s => `<div class="syn-chip"><span class="sw">${esc(s)}</span></div>`).join('')}</div></div>`;
-    });
-  }
-  syn.innerHTML = sh;
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
 
-  // CONNECTORS (HTML_CONNECTORS direct + section-intro)
-  p.querySelector('#id-conn').innerHTML = `<p class="muted">Sentence adverbials por función. Las tarjetas mantienen el color original por familia (adding, contrast, result…).</p>${HTML_CONNECTORS}`;
+  const c = p.querySelector('#syn-compact');
+  c.innerHTML += APP_DATA.SYN_GROUPS_COMPACT.map(g => `
+    <div class="syn-grp" data-word="${esc((g.word||'').toLowerCase())}">
+      <div class="syn-w">${esc(g.word)}</div>
+      <div class="syn-grid">${g.syns.map(s => `<div class="syn-chip"><span class="sw">${esc(s)}</span></div>`).join('')}</div>
+    </div>`).join('');
 
-  // COLLOCATIONS
-  const cl = p.querySelector('#id-colloc');
-  let ch = `<div class="filter-row" id="col-filter"><button class="fch on" data-cat="all">Todas</button>${Object.keys(APP_DATA.COLLOCATIONS).map(c => `<button class="fch" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
-  Object.entries(APP_DATA.COLLOCATIONS).forEach(([cat, items]) => {
-    ch += `<div class="col-grp" data-cat="${esc(cat)}"><div class="col-grp-h">${esc(cat)} <span class="small">(${items.length})</span></div>
-      <div class="col-list">${items.map(it => `<div class="col-it"><span class="col-w">${esc(it.w)}</span> <span class="col-d">— ${esc(it.d)}</span></div>`).join('')}</div></div>`;
-  });
-  cl.innerHTML = ch;
-  cl.querySelectorAll('#col-filter .fch').forEach(b => b.onclick = () => {
-    cl.querySelectorAll('#col-filter .fch').forEach(x => x.classList.remove('on'));
+  if (totalAdj) {
+    const a = p.querySelector('#syn-adj');
+    a.innerHTML += APP_DATA.ADJ_GROUPS.map(g => `
+      <div class="syn-grp" data-word="${esc((g.word||'').toLowerCase())}">
+        <div class="syn-w">${esc(g.word)}</div>
+        <div class="syn-grid">${(g.syns||[]).map(s => `<div class="syn-chip"><span class="sw">${esc(s)}</span></div>`).join('')}</div>
+      </div>`).join('');
+  }
+  if (totalNoun) {
+    const n = p.querySelector('#syn-noun');
+    n.innerHTML += APP_DATA.NOUN_GROUPS.map(g => `
+      <div class="syn-grp" data-word="${esc((g.word||'').toLowerCase())}">
+        <div class="syn-w">${esc(g.word)}</div>
+        <div class="syn-grid">${(g.syns||[]).map(s => `<div class="syn-chip"><span class="sw">${esc(s)}</span></div>`).join('')}</div>
+      </div>`).join('');
+  }
+
+  // Filter buttons (by section)
+  p.querySelectorAll('#syn-tabs .fch').forEach(b => b.onclick = () => {
+    p.querySelectorAll('#syn-tabs .fch').forEach(x => x.classList.remove('on'));
     b.classList.add('on');
-    const cat = b.dataset.cat;
-    cl.querySelectorAll('.col-grp').forEach(g => g.style.display = (cat==='all' || g.dataset.cat===cat) ? 'block' : 'none');
+    const filter = b.dataset.syn;
+    p.querySelectorAll('.syn-section').forEach(sec => {
+      const secKey = sec.id.replace('syn-','');
+      sec.style.display = (filter === 'all' || filter === secKey) ? 'block' : 'none';
+    });
+  });
+
+  // Search
+  const q = p.querySelector('#syn-q');
+  const countEl = p.querySelector('#syn-count');
+  q.addEventListener('input', () => {
+    const term = q.value.trim().toLowerCase();
+    let visible = 0;
+    p.querySelectorAll('.syn-grp').forEach(g => {
+      const w = g.dataset.word || '';
+      const txt = g.textContent.toLowerCase();
+      const match = !term || w.includes(term) || txt.includes(term);
+      g.style.display = match ? 'block' : 'none';
+      if (match) visible++;
+    });
+    countEl.textContent = term ? `${visible} resultados` : `${totalWords} grupos`;
   });
 }
 
@@ -1312,6 +1402,7 @@ function renderSpeakingWriting(){
       <button class="stb" data-t="nat">Natural English</button>
       <button class="stb" data-t="reported">Reported Speech</button>
       <button class="stb" data-t="essay">Essay phrases</button>
+      <button class="stb" data-t="conn">Connectors</button>
       <button class="stb" data-t="aptis">APTIS Speaking</button>
       <button class="stb" data-t="tips">Tips Speaking</button>
       <button class="stb" data-t="vaughan">Vaughan</button>
@@ -1324,6 +1415,7 @@ function renderSpeakingWriting(){
     <div class="panel" id="sw-nat"></div>
     <div class="panel" id="sw-reported"></div>
     <div class="panel" id="sw-essay"></div>
+    <div class="panel" id="sw-conn"></div>
     <div class="panel" id="sw-aptis"></div>
     <div class="panel" id="sw-tips"></div>
     <div class="panel" id="sw-vaughan"></div>
@@ -1393,6 +1485,8 @@ function renderSpeakingWriting(){
   p.querySelector('#sw-reported').innerHTML = rh;
   // Essay phrases
   p.querySelector('#sw-essay').innerHTML = `<p class="muted">Plantillas de essay/article/report — del Study Guide.</p>${HTML_ESSAY}`;
+  // Connectors (sentence adverbials por función — adding, contrast, result…)
+  p.querySelector('#sw-conn').innerHTML = `<p class="muted">Sentence adverbials por función. Las tarjetas mantienen el color original por familia (adding, contrast, result…). Úsalos para conectar ideas en speaking y writing.</p>${HTML_CONNECTORS}`;
   // APTIS Speaking Parts
   p.querySelector('#sw-aptis').innerHTML = `<p class="muted">APTIS speaking — partes 1 a 3 con guía rápida y linking expressions.</p>${HTML_APTIS_BLK}`;
   // Tips
@@ -2080,6 +2174,17 @@ window.vhRandom = function(){
 /* ===================== TESTS ===================== */
 const TEST_STATE = { current:null, qIdx:0, score:0, answers:[], pool:[], total:0, mode:null, timer:null, timeLeft:0 };
 
+// Cuenta segura del total de preguntas de un test Aptis: grammar es array, vocab puede ser array u objeto {q1,q2,...}.
+function aptCount(src){
+  if (!src) return 0;
+  const g = Array.isArray(src.grammar) ? src.grammar.length : 0;
+  let v = 0;
+  if (Array.isArray(src.vocab)) v = src.vocab.length;
+  else if (src.vocab && typeof src.vocab === 'object') v = Object.keys(src.vocab).length;
+  const f = Array.isArray(src.fillBlank) ? src.fillBlank.length : 0;
+  return g + v + f;
+}
+
 function renderTests(){
   const p = document.getElementById('page-tests');
   if (TEST_STATE.current) { renderTestQuestion(); return; }
@@ -2096,9 +2201,9 @@ function renderTests(){
       <button class="test-c" onclick="startTest('syn')"><div class="test-c-n">Vocab</div><div class="test-c-t">Synonyms Quiz</div><div class="test-c-d">${T.synQ.length} preguntas</div></button>
       <button class="test-c" onclick="startTest('def')"><div class="test-c-n">Vocab</div><div class="test-c-t">Definitions Quiz</div><div class="test-c-d">${T.defQ.length} preguntas</div></button>
       <button class="test-c" onclick="startTest('ctx')"><div class="test-c-n">Vocab</div><div class="test-c-t">Context Quiz</div><div class="test-c-d">${T.ctxQ.length} preguntas</div></button>
-      <button class="test-c" onclick="startTest('apt1')"><div class="test-c-n">Advanced</div><div class="test-c-t">Aptis Test 1 (Grammar+Vocab)</div><div class="test-c-d">${(T.apt['1'].grammar||[]).length + (T.apt['1'].vocab||[]).length}+ preguntas</div></button>
-      <button class="test-c" onclick="startTest('apt2')"><div class="test-c-n">Advanced</div><div class="test-c-t">Aptis Test 2</div><div class="test-c-d">${(T.apt['2'].grammar||[]).length + (T.apt['2'].vocab||[]).length}+ preguntas</div></button>
-      <button class="test-c" onclick="startTest('apt3')"><div class="test-c-n">Advanced</div><div class="test-c-t">Aptis Test 3</div><div class="test-c-d">${(T.apt['3'].grammar||[]).length + (T.apt['3'].vocab||[]).length}+ preguntas</div></button>
+      <button class="test-c" onclick="startTest('apt1')"><div class="test-c-n">Advanced</div><div class="test-c-t">Aptis Test 1 (Grammar+Vocab)</div><div class="test-c-d">${aptCount(T.apt['1'])} preguntas</div></button>
+      <button class="test-c" onclick="startTest('apt2')"><div class="test-c-n">Advanced</div><div class="test-c-t">Aptis Test 2</div><div class="test-c-d">${aptCount(T.apt['2'])} preguntas</div></button>
+      <button class="test-c" onclick="startTest('apt3')"><div class="test-c-n">Advanced</div><div class="test-c-t">Aptis Test 3</div><div class="test-c-d">${aptCount(T.apt['3'])} preguntas</div></button>
       <button class="test-c" onclick="startTest('apt4')"><div class="test-c-n">Extra</div><div class="test-c-t">Aptis Test 4</div><div class="test-c-d">Grammar + Vocab C2</div></button>
       <button class="test-c" onclick="startTest('apt5')"><div class="test-c-n">Extra</div><div class="test-c-t">Aptis Test 5</div><div class="test-c-d">Grammar + Vocab C2</div></button>
       <button class="test-c" onclick="startTest('full')" style="border-color:var(--accent);background:var(--accent-soft)">
@@ -2385,20 +2490,18 @@ function finishTest(){
 function renderPlan(){
   const p = document.getElementById('page-plan');
   p.innerHTML = `
-    <div class="h-sec"><h1>Plan de estudio</h1><p>Plan Focus + temario semanal + flashcards C1/C2 + repaso SRS de errores.</p></div>
+    <div class="h-sec"><h1>Plan de estudio</h1><p>Plan Focus + temario semanal (calendario L-V) + 20 unidades Activate + repaso SRS de errores. <em>Las flashcards están en <strong>Vocabulario → Flashcards C1/C2</strong>.</em></p></div>
     <div class="subtabs" id="pl-tabs">
       <button class="stb on" data-t="focus">Protocolo Focus</button>
       <button class="stb" data-t="planapt">Plan Focus (Aptis Complete)</button>
       <button class="stb" data-t="temario">Temario semanal</button>
       <button class="stb" data-t="activate">Programa Activate (20 unidades)</button>
-      <button class="stb" data-t="flash">Flashcards</button>
       <button class="stb" data-t="srs">Repaso SRS</button>
     </div>
     <div class="panel on" id="pl-focus"></div>
     <div class="panel" id="pl-planapt"></div>
     <div class="panel" id="pl-temario"></div>
     <div class="panel" id="pl-activate"></div>
-    <div class="panel" id="pl-flash"></div>
     <div class="panel" id="pl-srs"></div>
   `;
   p.querySelectorAll('#pl-tabs .stb').forEach(b => b.onclick = () => {
@@ -2480,9 +2583,7 @@ function renderPlan(){
     </div>`;
   });
   p.querySelector('#pl-activate').innerHTML = ah;
-  // Flashcards
-  p.querySelector('#pl-flash').innerHTML = renderFlashWidget(APP_DATA.FLASHCARDS, 'pl-fl');
-  attachFlashWidget('pl-fl', APP_DATA.FLASHCARDS);
+  // (Flashcards movidas a Vocabulario → Flashcards C1/C2 para evitar duplicación)
   // SRS
   p.querySelector('#pl-srs').innerHTML = renderSRS();
   attachSRSHandlers();
@@ -2610,25 +2711,102 @@ function attachSRSHandlers(){ /* nothing extra */ }
 /* ===================== SEARCH ===================== */
 const SEARCH_INDEX = [];
 function buildSearchIndex(){
+  // ===== SECCIONES Y PESTAÑAS (navegación directa) =====
+  const SECTIONS = [
+    // Páginas top-level
+    { title: 'Inicio', page: 'home', loc: '📍 Página', snip: 'Resumen y accesos rápidos' },
+    { title: 'Gramática', page: 'grammar', loc: '📍 Página', snip: 'Tiempos, referencia, Pro Grammar, Reported Speech, Yet/Already/Still/Anymore' },
+    { title: 'Vocabulario', page: 'vocab', loc: '📍 Página', snip: 'Listas · sinónimos · phrasal &amp; preps · idioms · collocations · mapas · flashcards' },
+    { title: 'Speaking &amp; Writing', page: 'speaking', loc: '📍 Página', snip: 'Funciones · temas · natural English · reported · essay · connectors · Vaughan · tips' },
+    { title: 'Tests APTIS', page: 'tests', loc: '📍 Página', snip: '4 partes + tests extra + Aptis 1-5 + examen completo' },
+    { title: 'Plan de estudio', page: 'plan', loc: '📍 Página', snip: 'Protocolo Focus · temario calendario · Activate · SRS' },
+
+    // Gramática (subtabs)
+    { title: 'Tiempos verbales', page: 'grammar', sub: 'tense', loc: '📂 Gramática', snip: 'Decisor visual + señales temporales + confusiones C1' },
+    { title: 'General Grammar', page: 'grammar', sub: 'units', loc: '📂 Gramática', snip: '12 unidades del libro Activate C1' },
+    { title: 'Referencia general', page: 'grammar', sub: 'ref', loc: '📂 Gramática', snip: '8 fichas G1, G2, G3, G5-G9 con reglas y ejemplos' },
+    { title: 'Pro Grammar (APTIS)', page: 'grammar', sub: 'pro', loc: '📂 Gramática', snip: 'Inversión, cleft, modal perfects, fronting, hedging' },
+    { title: 'Reported Speech', page: 'grammar', sub: 'rs', loc: '📂 Gramática', snip: 'Backshift de tiempos, pronombres y modales' },
+    { title: 'Yet / Already / Still / Anymore', page: 'grammar', sub: 'ysa', loc: '📂 Gramática', snip: 'Adverbios de tiempo: cuándo se usa cada uno' },
+
+    // Vocabulario (subtabs)
+    { title: 'Listas temáticas', page: 'vocab', sub: 'lists', loc: '📂 Vocabulario', snip: '30 categorías agrupadas: Activate C1, Bloques semánticos, Advanced' },
+    { title: 'Sinónimos', page: 'vocab', sub: 'syn', loc: '📂 Vocabulario', snip: '60+ grupos de sinónimos C1/C2 con búsqueda en vivo' },
+    { title: 'Phrasal &amp; Preps', page: 'vocab', sub: 'phrasal', loc: '📂 Vocabulario', snip: 'Phrasals, prep phrases, prep uses, adj/verb + prep' },
+    { title: 'Idioms', page: 'vocab', sub: 'idioms', loc: '📂 Vocabulario', snip: '12 temas de idioms con ejemplos genéricos y personales' },
+    { title: 'Collocations', page: 'vocab', sub: 'coll', loc: '📂 Vocabulario', snip: 'Colocaciones por categoría abstracta y por tema APTIS' },
+    { title: 'Mapas conceptuales', page: 'vocab', sub: 'maps', loc: '📂 Vocabulario', snip: '7 bloques visuales con ~20 temas' },
+    { title: 'Flashcards C1/C2', page: 'vocab', sub: 'flash', loc: '📂 Vocabulario', snip: '69 flashcards categorizadas para repaso' },
+
+    // Phrasal &amp; Preps (sub-subtabs)
+    { title: 'Phrasals (por partícula)', page: 'vocab', sub: 'phrasal', sub2: 'pv', loc: '📂 Vocab → Phrasal', snip: '245 phrasal verbs agrupados por partícula (up, out, off…)' },
+    { title: 'Phrasals de 3 partes', page: 'vocab', sub: 'phrasal', sub2: '3p', loc: '📂 Vocab → Phrasal', snip: 'come up with, look forward to, get away with…' },
+    { title: 'Adjetivos compuestos', page: 'vocab', sub: 'phrasal', sub2: 'adjp', loc: '📂 Vocab → Phrasal', snip: 'well-off, cheesed off, built-up, worn-out…' },
+    { title: 'Sustantivos derivados de phrasals', page: 'vocab', sub: 'phrasal', sub2: 'npv', loc: '📂 Vocab → Phrasal', snip: 'breakdown, breakthrough, checkout, takeoff…' },
+    { title: 'Reglas AT / IN / ON / BY', page: 'vocab', sub: 'phrasal', sub2: 'puses', loc: '📂 Vocab → Phrasal', snip: 'Usos principales de las preposiciones con ejemplos' },
+    { title: 'Frases hechas con preposición', page: 'vocab', sub: 'phrasal', sub2: 'ppf', loc: '📂 Vocab → Phrasal', snip: 'at ease, by chance, in fact, on purpose…' },
+    { title: 'Adjetivo + preposición', page: 'vocab', sub: 'phrasal', sub2: 'adjpr', loc: '📂 Vocab → Phrasal', snip: 'good at, afraid of, interested in, married to…' },
+    { title: 'Verbo + preposición', page: 'vocab', sub: 'phrasal', sub2: 'vbpr', loc: '📂 Vocab → Phrasal', snip: 'depend on, belong to, consist of, apologise for…' },
+
+    // Speaking &amp; Writing (subtabs)
+    { title: 'Funciones (opinar, hedging, acordar)', page: 'speaking', sub: 'fn', loc: '🎙 Speaking', snip: 'Frases por función discursiva' },
+    { title: 'Temas Aptis', page: 'speaking', sub: 'topics', loc: '🎙 Speaking', snip: 'Temas APTIS con preguntas, chunks y respuesta modelo' },
+    { title: 'Natural English', page: 'speaking', sub: 'nat', loc: '🎙 Speaking', snip: 'Avoid → natural: cómo no sonar a libro de texto' },
+    { title: 'Reported Speech (Speaking)', page: 'speaking', sub: 'reported', loc: '🎙 Speaking', snip: 'Estructuras de reported speech aplicadas a habla' },
+    { title: 'Essay phrases', page: 'speaking', sub: 'essay', loc: '🎙 Speaking', snip: 'Plantillas de essay, article, report' },
+    { title: 'Connectors', page: 'speaking', sub: 'conn', loc: '🎙 Speaking', snip: 'Sentence adverbials por función (adding, contrast, result…)' },
+    { title: 'APTIS Speaking', page: 'speaking', sub: 'aptis', loc: '🎙 Speaking', snip: 'Partes 1-3 del examen con guía y linkers' },
+    { title: 'Tips Speaking', page: 'speaking', sub: 'tips', loc: '🎙 Speaking', snip: 'Formato general APTIS · estructura Part 4 · signposting · cronómetro' },
+    { title: 'Signposting language', page: 'speaking', sub: 'tips', loc: '🎙 Speaking → Tips', snip: 'Frases para mini-presentaciones: abrir, estructurar, transicionar, cerrar' },
+    { title: 'Vaughan (preguntas indirectas estilo Vaughan)', page: 'speaking', sub: 'vaughan', loc: '🎙 Speaking', snip: '40 ejemplos en 10 tiempos verbales: ask me / him / her / them → Do you…?' },
+    { title: 'Preguntas indirectas', page: 'speaking', sub: 'indirect', loc: '🎙 Speaking', snip: 'Estructura de preguntas indirectas' },
+    { title: 'Speaking APT (completo)', page: 'speaking', sub: 'spfull', loc: '🎙 Speaking', snip: 'Guía completa de Aptis Speaking' },
+    { title: 'Writing APT (completo)', page: 'speaking', sub: 'wfull', loc: '🎙 Speaking', snip: 'Guía completa de Aptis Writing' },
+
+    // Plan (subtabs)
+    { title: 'Protocolo Focus', page: 'plan', sub: 'focus', loc: '📅 Plan', snip: 'Micro-sesiones, body doubling, dictado inverso' },
+    { title: 'Plan Focus (Aptis Complete)', page: 'plan', sub: 'planapt', loc: '📅 Plan', snip: 'Manifesto + microsesión + mapa 8 semanas' },
+    { title: 'Temario semanal (calendario)', page: 'plan', sub: 'temario', loc: '📅 Plan', snip: '8 semanas · 5 sesiones de 25 min · Lunes a Viernes con tarjetas' },
+    { title: 'Programa Activate (20 unidades)', page: 'plan', sub: 'activate', loc: '📅 Plan', snip: 'Unidades del libro Activate C1 con focus por área' },
+    { title: 'Repaso SRS', page: 'plan', sub: 'srs', loc: '📅 Plan', snip: 'Spaced repetition de tus errores acumulados' },
+
+    // Tests (atajos a cada modo)
+    { title: 'Test: Word Definitions', page: 'tests', loc: '🧪 Tests', snip: 'Part 1 — definiciones de palabras' },
+    { title: 'Test: Sentence Completion', page: 'tests', loc: '🧪 Tests', snip: 'Part 2 — completar frases' },
+    { title: 'Test: Word Order', page: 'tests', loc: '🧪 Tests', snip: 'Part 3 — ordenar palabras' },
+    { title: 'Test: Find the Error', page: 'tests', loc: '🧪 Tests', snip: 'Part 4 — encontrar el error' },
+    { title: 'Test: Collocations Quiz', page: 'tests', loc: '🧪 Tests', snip: 'Quiz de colocaciones' },
+    { title: 'Test: Synonyms Quiz', page: 'tests', loc: '🧪 Tests', snip: 'Quiz de sinónimos' },
+    { title: 'Test: Definitions Quiz', page: 'tests', loc: '🧪 Tests', snip: 'Quiz de definiciones' },
+    { title: 'Test: Context Quiz', page: 'tests', loc: '🧪 Tests', snip: 'Quiz de contexto' },
+    { title: 'Aptis Test 1', page: 'tests', loc: '🧪 Tests', snip: 'Test completo Aptis Advanced 1' },
+    { title: 'Aptis Test 2', page: 'tests', loc: '🧪 Tests', snip: 'Test completo Aptis Advanced 2' },
+    { title: 'Aptis Test 3', page: 'tests', loc: '🧪 Tests', snip: 'Test completo Aptis Advanced 3' },
+    { title: 'Examen completo APTIS Advanced', page: 'tests', loc: '🧪 Tests', snip: '25 preguntas mezcladas · cronómetro 15 min' },
+    { title: 'Repaso de errores', page: 'tests', loc: '🧪 Tests', snip: 'Solo tus errores guardados' },
+  ];
+  SECTIONS.forEach(s => SEARCH_INDEX.push(s));
+
+  // ===== ITEMS INDIVIDUALES =====
   // Vocab
   APP_DATA.VOCAB_CATS.forEach(c => c.items.forEach(it => {
     SEARCH_INDEX.push({ title: it.en, page: 'vocab', loc: c.name, snip: (it.es||it.def||'') });
   }));
-  // Phrasals
+  // Phrasals (todos viven dentro de Vocabulario → Phrasal &amp; Preps)
   Object.entries(APP_DATA.PV_BY_PARTICLE).forEach(([part, arr]) => arr.forEach(pv => {
-    SEARCH_INDEX.push({ title: pv.w, page: 'phrasal', loc: 'Phrasal · '+part, snip: pv.meanings.join(' · ') });
+    SEARCH_INDEX.push({ title: pv.w, page: 'vocab', sub: 'phrasal', loc: 'Phrasal · '+part, snip: pv.meanings.join(' · ') });
   }));
-  APP_DATA.PV_3PART.forEach(pv => SEARCH_INDEX.push({ title: pv.w, page: 'phrasal', loc: '3-part', snip: pv.m || '' }));
-  APP_DATA.ADJ_PARTICLES.forEach(pv => SEARCH_INDEX.push({ title: pv.w, page: 'phrasal', loc: 'Adj+part', snip: pv.m || '' }));
-  APP_DATA.NOUNS_FROM_PV.forEach(pv => SEARCH_INDEX.push({ title: pv.w, page: 'phrasal', loc: 'Noun from PV', snip: pv.m || '' }));
+  APP_DATA.PV_3PART.forEach(pv => SEARCH_INDEX.push({ title: pv.w, page: 'vocab', sub: 'phrasal', loc: '3-part', snip: pv.m || '' }));
+  APP_DATA.ADJ_PARTICLES.forEach(pv => SEARCH_INDEX.push({ title: pv.w, page: 'vocab', sub: 'phrasal', loc: 'Adj+part', snip: pv.m || '' }));
+  APP_DATA.NOUNS_FROM_PV.forEach(pv => SEARCH_INDEX.push({ title: pv.w, page: 'vocab', sub: 'phrasal', loc: 'Noun from PV', snip: pv.m || '' }));
   // Preps
-  Object.entries(APP_DATA.PREP_PHRASES).forEach(([k, arr]) => arr.forEach(i => SEARCH_INDEX.push({ title: i.p, page: 'phrasal', loc: 'Prep · '+k, snip: i.m || '' })));
-  // Collocations
-  Object.entries(APP_DATA.COLLOCATIONS).forEach(([k, arr]) => arr.forEach(i => SEARCH_INDEX.push({ title: i.w, page: 'idioms', loc: 'Colloc · '+k, snip: i.d || '' })));
-  // Idioms
-  APP_DATA.IDIOM_TOPICS.forEach(t => t.idioms.forEach(i => SEARCH_INDEX.push({ title: i.phrase, page: 'idioms', loc: 'Idiom · '+t.title, snip: i.meaning })));
-  // Synonyms
-  APP_DATA.SYNONYMS.forEach(g => g.synonyms.forEach(s => SEARCH_INDEX.push({ title: s.w, page: 'idioms', loc: 'Syn · '+g.word, snip: s.es || '' })));
+  Object.entries(APP_DATA.PREP_PHRASES).forEach(([k, arr]) => arr.forEach(i => SEARCH_INDEX.push({ title: i.p, page: 'vocab', sub: 'phrasal', loc: 'Prep · '+k, snip: i.m || '' })));
+  // Collocations (en Vocab → Collocations)
+  Object.entries(APP_DATA.COLLOCATIONS).forEach(([k, arr]) => arr.forEach(i => SEARCH_INDEX.push({ title: i.w, page: 'vocab', sub: 'coll', loc: 'Colloc · '+k, snip: i.d || '' })));
+  // Idioms (en Vocab → Idioms)
+  APP_DATA.IDIOM_TOPICS.forEach(t => t.idioms.forEach(i => SEARCH_INDEX.push({ title: i.phrase, page: 'vocab', sub: 'idioms', loc: 'Idiom · '+t.title, snip: i.meaning })));
+  // Synonyms (en Vocab → Sinónimos)
+  APP_DATA.SYNONYMS.forEach(g => g.synonyms.forEach(s => SEARCH_INDEX.push({ title: s.w, page: 'vocab', sub: 'syn', loc: 'Syn · '+g.word, snip: s.es || '' })));
   // Grammar units
   APP_DATA.HUB_GRAMMAR.forEach(u => u.sections.forEach(s => SEARCH_INDEX.push({ title: u.t + ' — ' + s.h, page: 'grammar', loc: 'Activate U'+u.n, snip: s.body.replace(/<[^>]+>/g,'').slice(0,120) })));
   APP_DATA.REF_GRAMMAR.forEach(u => u.topics.forEach(t => SEARCH_INDEX.push({ title: u.title + ' — ' + t.name, page: 'grammar', loc: 'Reference '+u.id, snip: (t.rules||[]).map(r => r.replace(/<[^>]+>/g,'')).join(' · ').slice(0,120) })));
@@ -2640,32 +2818,50 @@ function buildSearchIndex(){
   APP_DATA.ACTIVATE_UNITS.forEach(u => SEARCH_INDEX.push({ title: 'Unit '+u.num+': '+u.topic, page: 'plan', loc: 'Activate Plan', snip: u.grammar + ' · ' + u.vocab.slice(0,60) }));
   // Maps
   (APP_DATA.MAPS.blocks||[]).forEach(b => (b.topics||[]).forEach(tp => SEARCH_INDEX.push({ title: tp.name, page: 'vocab', loc: 'Mapa · '+b.title, snip: tp.es || '' })));
-  // Flashcards
-  APP_DATA.FLASHCARDS.forEach(c => SEARCH_INDEX.push({ title: (c.front||'').replace(/\n/g,' ').slice(0,80), page: 'plan', loc: 'Flashcard · '+c.cat, snip: (c.back||'').replace(/\n/g,' ').slice(0,120) }));
+  // Flashcards (en Vocab → Flashcards C1/C2)
+  APP_DATA.FLASHCARDS.forEach(c => SEARCH_INDEX.push({ title: (c.front||'').replace(/\n/g,' ').slice(0,80), page: 'vocab', sub: 'flash', loc: 'Flashcard · '+c.cat, snip: (c.back||'').replace(/\n/g,' ').slice(0,120) }));
 }
+// Normalizador: quita acentos para que "sinonim" encuentre "Sinónimos"
+const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 searchInput.addEventListener('input', e => {
-  const q = e.target.value.toLowerCase().trim();
+  const q = norm(e.target.value.trim());
   const res = document.getElementById('search-results');
   if (!q) { res.innerHTML = ''; return; }
-  const matches = SEARCH_INDEX.filter(it =>
-    String(it.title||'').toLowerCase().includes(q) ||
-    String(it.snip||'').toLowerCase().includes(q) ||
-    String(it.loc||'').toLowerCase().includes(q)
-  ).slice(0, 25);
+  // Filter + score (secciones primero, luego coincidencias en título, luego en snip/loc)
+  const matches = SEARCH_INDEX
+    .map(it => {
+      const t = norm(it.title);
+      const s = norm(it.snip);
+      const l = norm(it.loc);
+      let score = 0;
+      const locRaw = String(it.loc||'');
+      const isSection = /^[📍📂🎙📅🧪]/.test(locRaw);
+      if (t === q) score += 100;
+      else if (t.startsWith(q)) score += 50;
+      else if (t.includes(q)) score += 30;
+      if (s.includes(q)) score += 5;
+      if (l.includes(q)) score += 3;
+      if (isSection && score > 0) score += 20; // boost sections
+      return { it, score };
+    })
+    .filter(x => x.score > 0)
+    .sort((a,b) => b.score - a.score)
+    .slice(0, 25)
+    .map(x => x.it);
   if (!matches.length) { res.innerHTML = '<div class="sr"><div class="sr-t">Sin resultados</div></div>'; return; }
-  res.innerHTML = matches.map(m => `
-    <div class="sr" onclick="go('${m.page}');searchModal.classList.remove('on');searchInput.value='';">
+  res.innerHTML = matches.map(m => {
+    const args = `'${m.page}'` + (m.sub ? `, '${m.sub}'` : (m.sub2 ? `, undefined` : '')) + (m.sub2 ? `, '${m.sub2}'` : '');
+    return `<div class="sr" onclick="go(${args});searchModal.classList.remove('on');searchInput.value='';">
       <div class="sr-t">${esc(m.title)}<span class="sr-loc">${esc(m.loc)}</span></div>
       ${m.snip?`<div class="sr-snip">${esc(m.snip)}</div>`:''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 });
 
 /* ============ INIT ============ */
 renderHome();
 renderGrammar();
-renderVocab();
-renderPhrasal();
-renderIdioms();
+renderVocab(); // also renders Synonyms, Phrasal, Idioms as subtabs
 renderSpeakingWriting();
 renderTests();
 renderPlan();
